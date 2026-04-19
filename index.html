@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LT QA Audit — ฟอร์มตรวจสาขา</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Sarabun','Arial',sans-serif; background: #f0f2f5; color: #1a1a2e; font-size: 14px; }
+
+/* NAV */
+.topnav {
+  background: #1a1a2e; color: #fff;
+  padding: 0 20px; display: flex; align-items: center;
+  height: 54px; position: sticky; top: 0; z-index: 200;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3); gap: 16px;
+}
+.topnav .brand { font-size: 17px; font-weight: 700; color: #f5a623; margin-right: auto; }
+.topnav .step-info { font-size: 13px; color: #aaa; }
+.topnav .score-live {
+  background: #f5a623; color: #1a1a2e;
+  padding: 4px 14px; border-radius: 20px;
+  font-weight: 800; font-size: 15px;
+}
+
+/* PROGRESS BAR */
+.progress-bar-wrap { background: #2d2d4e; height: 4px; }
+.progress-bar-fill { height: 4px; background: #f5a623; transition: width .4s; }
+
+/* WRAPPER */
+.wrapper { max-width: 900px; margin: 0 auto; padding: 20px 16px 80px; }
+
+/* STEP PAGES */
+.step-page { display: none; }
+.step-page.active { display: block; }
+
+/* CARD */
+.card {
+  background: #fff; border-radius: 12px;
+  padding: 20px 24px; margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+.card h2 { font-size: 16px; margin-bottom: 16px; color: #333; font-weight: 700; }
+.card h3 { font-size: 14px; margin-bottom: 12px; color: #555; font-weight: 600; }
+
+/* FORM GRID */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media(max-width:600px){ .form-grid { grid-template-columns: 1fr; } }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 12px; color: #888; font-weight: 600; }
+.form-group input, .form-group select {
+  padding: 10px 12px; border: 1.5px solid #e0e0e0;
+  border-radius: 8px; font-size: 14px; outline: none;
+  transition: border .2s;
+}
+.form-group input:focus, .form-group select:focus { border-color: #f5a623; }
+
+/* SECTION HEADER */
+.section-header {
+  background: linear-gradient(90deg, #1a1a2e, #2d2d4e);
+  color: #fff; padding: 14px 18px; border-radius: 10px;
+  margin-bottom: 12px; display: flex; align-items: center;
+  gap: 12px;
+}
+.section-code-big {
+  width: 38px; height: 38px; border-radius: 8px;
+  background: #f5a623; color: #1a1a2e;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 18px; flex-shrink: 0;
+}
+.section-header .sec-name { font-size: 15px; font-weight: 700; }
+.section-header .sec-meta { font-size: 12px; color: #aaa; margin-top: 2px; }
+.section-score-badge {
+  margin-left: auto; background: rgba(255,255,255,.15);
+  padding: 4px 12px; border-radius: 20px;
+  font-size: 13px; font-weight: 700;
+}
+
+/* CHECKLIST ITEMS */
+.checklist-item {
+  border: 1.5px solid #f0f0f0; border-radius: 10px;
+  padding: 12px 14px; margin-bottom: 8px;
+  transition: all .2s; background: #fff;
+}
+.checklist-item.failed { border-color: #f5c6cb; background: #fff8f8; }
+.checklist-item.passed { border-color: #c3e6cb; background: #f8fff9; }
+.item-row { display: flex; align-items: center; gap: 12px; }
+.item-num { color: #bbb; font-size: 12px; min-width: 28px; }
+.item-text { flex: 1; line-height: 1.5; }
+.toggle-group { display: flex; gap: 6px; flex-shrink: 0; }
+.btn-pass, .btn-fail {
+  padding: 5px 14px; border-radius: 20px; border: 1.5px solid;
+  cursor: pointer; font-size: 12px; font-weight: 700;
+  transition: all .15s; background: #fff;
+}
+.btn-pass { border-color: #28a745; color: #28a745; }
+.btn-pass.active { background: #28a745; color: #fff; }
+.btn-fail { border-color: #dc3545; color: #dc3545; }
+.btn-fail.active { background: #dc3545; color: #fff; }
+.remark-input {
+  margin-top: 8px; width: 100%;
+  padding: 7px 10px; border: 1px solid #f5c6cb;
+  border-radius: 6px; font-size: 13px; color: #721c24;
+  background: #fff5f5; outline: none; display: none;
+}
+.remark-input.show { display: block; }
+
+/* PHOTO UPLOAD */
+.photo-area { margin-top: 8px; display: none; }
+.photo-area.show { display: block; }
+.photo-upload-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border: 1.5px dashed #f5a623;
+  border-radius: 8px; background: #fffbf0; color: #c47d00;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: all .2s;
+}
+.photo-upload-btn:hover { background: #fff3d0; }
+.photo-upload-btn input { display: none; }
+.photo-thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.photo-thumb {
+  position: relative; width: 72px; height: 72px;
+  border-radius: 8px; overflow: hidden;
+  border: 2px solid #f5c6cb; cursor: pointer;
+}
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.photo-thumb .del-btn {
+  position: absolute; top: 2px; right: 2px;
+  background: rgba(220,53,69,.85); color: #fff;
+  border: none; border-radius: 50%; width: 18px; height: 18px;
+  font-size: 10px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center; font-weight: 700;
+}
+
+/* LIGHTBOX */
+.lightbox {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.85); z-index: 9999;
+  align-items: center; justify-content: center;
+}
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 92vw; max-height: 88vh; border-radius: 10px; }
+.lightbox .lb-close {
+  position: absolute; top: 16px; right: 20px;
+  color: #fff; font-size: 32px; cursor: pointer; line-height: 1;
+}
+.lightbox .lb-caption {
+  position: absolute; bottom: 16px; left: 0; right: 0;
+  text-align: center; color: #fff; font-size: 13px;
+}
+
+/* FAIL PHOTOS IN DASHBOARD */
+.fail-photos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.fail-photo-thumb {
+  width: 60px; height: 60px; border-radius: 6px; overflow: hidden;
+  border: 1px solid #f5c6cb; cursor: pointer;
+}
+.fail-photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+/* BUTTONS */
+.btn-primary {
+  background: #f5a623; color: #1a1a2e;
+  border: none; padding: 12px 28px; border-radius: 8px;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  transition: all .2s;
+}
+.btn-primary:hover { background: #e09000; transform: translateY(-1px); }
+.btn-secondary {
+  background: #fff; color: #555;
+  border: 1.5px solid #ddd; padding: 12px 24px;
+  border-radius: 8px; font-size: 14px; cursor: pointer;
+}
+.btn-secondary:hover { border-color: #aaa; }
+.btn-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+
+/* SECTION NAV */
+.section-nav {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.sec-tab {
+  padding: 6px 12px; border-radius: 20px;
+  border: 1.5px solid #ddd; background: #fff;
+  cursor: pointer; font-size: 12px; font-weight: 700;
+  transition: all .2s; color: #555;
+}
+.sec-tab.active { background: #1a1a2e; color: #f5a623; border-color: #1a1a2e; }
+.sec-tab.done { border-color: #28a745; color: #28a745; }
+.sec-tab.has-fail { border-color: #dc3545; color: #dc3545; }
+
+/* DASHBOARD */
+.score-hero {
+  background: linear-gradient(135deg,#1a1a2e,#16213e);
+  color: #fff; border-radius: 16px; padding: 28px;
+  display: flex; align-items: center; gap: 28px; margin-bottom: 16px;
+}
+.score-circle {
+  width: 120px; height: 120px; border-radius: 50%;
+  border: 7px solid #f5a623;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; flex-shrink: 0;
+}
+.score-circle .num { font-size: 30px; font-weight: 800; color: #f5a623; }
+.score-circle .pct { font-size: 13px; color: #aaa; }
+.score-info h1 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.score-info .meta { font-size: 12px; color: #aaa; line-height: 1.8; }
+.grade-badge {
+  display: inline-block; padding: 4px 14px;
+  border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 8px;
+}
+.grade-excellent { background:#d4edda; color:#155724; }
+.grade-standard  { background:#d1ecf1; color:#0c5460; }
+.grade-improve   { background:#fff3cd; color:#856404; }
+.grade-urgent    { background:#f8d7da; color:#721c24; }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 16px; }
+@media(max-width:600px){ .kpi-grid { grid-template-columns: repeat(2,1fr); } }
+.kpi { background:#fff; border-radius:10px; padding:16px; text-align:center; border-top:4px solid #eee; box-shadow:0 1px 4px rgba(0,0,0,.08); }
+.kpi.t { border-color:#f5a623; } .kpi.p { border-color:#28a745; }
+.kpi.f { border-color:#dc3545; } .kpi.s { border-color:#6f42c1; }
+.kpi .val { font-size:28px; font-weight:800; }
+.kpi .lbl { font-size:11px; color:#666; margin-top:2px; }
+.kpi.t .val{color:#f5a623;} .kpi.p .val{color:#28a745;}
+.kpi.f .val{color:#dc3545;} .kpi.s .val{color:#6f42c1;}
+
+.sec-table { width:100%; border-collapse:collapse; }
+.sec-table th { background:#f7f8fa; padding:9px 12px; text-align:left; font-size:12px; color:#555; border-bottom:2px solid #e0e0e0; }
+.sec-table td { padding:9px 12px; border-bottom:1px solid #f0f0f0; font-size:13px; }
+.sec-table tr:hover td { background:#fafafa; }
+.bar-wrap { background:#eee; border-radius:4px; height:7px; min-width:100px; }
+.bar-fill { height:7px; border-radius:4px; }
+
+.fail-list { margin-top:6px; }
+.fail-item {
+  background:#fff8f8; border-left:3px solid #dc3545;
+  padding:8px 12px; border-radius:0 6px 6px 0;
+  margin-bottom:6px; font-size:13px;
+}
+.fail-item .fi-num { color:#dc3545; font-weight:700; font-size:11px; }
+.fail-item .fi-remark { color:#888; font-size:12px; margin-top:2px; }
+
+.chart-wrap { height:260px; position:relative; }
+
+/* STICKY BOTTOM */
+.sticky-bottom {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff; padding: 12px 20px;
+  box-shadow: 0 -2px 12px rgba(0,0,0,.1);
+  display: flex; align-items: center; justify-content: space-between;
+  z-index: 100;
+}
+.sticky-bottom .progress-text { font-size: 13px; color: #888; }
+
+/* PRINT */
+@media print {
+  .topnav, .sticky-bottom, .section-nav, .btn-row, .btn-primary, .btn-secondary { display: none !important; }
+  .step-page { display: block !important; }
+  .card { box-shadow: none; border: 1px solid #ddd; }
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">🍽 LT QA Audit</div>
+  <span class="step-info" id="stepInfo">ขั้นตอน 1/3</span>
+  <span class="score-live" id="scoreLive" style="display:none">0.00%</span>
+</nav>
+<div class="progress-bar-wrap">
+  <div class="progress-bar-fill" id="progressBar" style="width:33%"></div>
+</div>
+
+<div class="wrapper">
+
+<!-- ═══════════════════════════════ STEP 1: INFO ═══════════════════════════════ -->
+<div class="step-page active" id="step1">
+  <div class="card">
+    <h2>📋 ข้อมูลการตรวจสาขา</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>รหัสสาขา</label>
+        <select id="branchCode">
+          <option value="">-- เลือกสาขา --</option>
+          <option value="5001">5001 — Fashion Island</option>
+          <option value="5002">5002 — Seacon Srinakarin</option>
+          <option value="5003">5003 — The Mall Thapra</option>
+          <option value="5004">5004 — CT Rattanathibet</option>
+          <option value="5005">5005 — The Mall Bangkapi</option>
+          <option value="5007">5007 — CT Rama 2</option>
+          <option value="5010">5010 — Passion Rayong</option>
+          <option value="5011">5011 — The Mall Ngamwongwan</option>
+          <option value="5012">5012 — LT Bangplee</option>
+          <option value="5013">5013 — Laemthong Bangsaen</option>
+          <option value="5014">5014 — Big C Extra Middle Pattaya</option>
+          <option value="5015">5015 — Pacific Park Sriracha</option>
+          <option value="5016">5016 — Imperial World Samrong</option>
+          <option value="5017">5017 — Seacon Bangkae</option>
+          <option value="5018">5018 — CT Ramintra</option>
+          <option value="5019">5019 — Terminal 21 Asok</option>
+          <option value="5023">5023 — Big C Extra South Pattaya</option>
+          <option value="5024">5024 — The Mall Bangkae</option>
+          <option value="5025">5025 — Big C Extra Srinakarin</option>
+          <option value="5049">5049 — LT Chonburi</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>วันที่ตรวจ</label>
+        <input type="date" id="auditDate">
+      </div>
+      <div class="form-group">
+        <label>ชื่อผู้ตรวจ (QA)</label>
+        <input type="text" id="inspector" placeholder="ชื่อ-นามสกุล">
+      </div>
+      <div class="form-group">
+        <label>ชื่อผู้จัดการสาขา</label>
+        <input type="text" id="manager" placeholder="ชื่อ-นามสกุล">
+      </div>
+      <div class="form-group">
+        <label>พนักงานบริการ</label>
+        <input type="text" id="serviceStaff" placeholder="เช่น 1+1">
+      </div>
+      <div class="form-group">
+        <label>พนักงานครัว</label>
+        <input type="text" id="kitchenStaff" placeholder="เช่น 1+1">
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goToStep2()">เริ่มตรวจ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ STEP 2: CHECKLIST ═══════════════════════════════ -->
+<div class="step-page" id="step2">
+  <div class="section-nav" id="sectionNav"></div>
+  <div id="sectionContent"></div>
+  <div class="sticky-bottom">
+    <span class="progress-text" id="progressText">กรอกแล้ว 0 / 0 รายการ</span>
+    <div style="display:flex;gap:8px">
+      <button class="btn-secondary" onclick="goToStep1()">← ย้อนกลับ</button>
+      <button class="btn-primary" id="btnFinish" onclick="goToStep3()" disabled>ดูผลสรุป →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ STEP 3: DASHBOARD ═══════════════════════════════ -->
+<div class="step-page" id="step3">
+  <div class="score-hero" id="heroCard"></div>
+  <div class="kpi-grid" id="kpiGrid"></div>
+  <div class="card">
+    <h2>📊 คะแนนแยกตามหมวด</h2>
+    <table class="sec-table">
+      <thead><tr>
+        <th>หมวด</th><th>ชื่อ</th>
+        <th style="text-align:center">รายการ</th>
+        <th style="text-align:center">ไม่ผ่าน</th>
+        <th style="text-align:center">%</th>
+        <th>Progress</th>
+        <th style="text-align:right">คะแนนได้</th>
+      </tr></thead>
+      <tbody id="resultTable"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h2>📈 กราฟคะแนน</h2>
+    <div class="chart-wrap"><canvas id="resultChart"></canvas></div>
+  </div>
+  <div class="card" id="failCard">
+    <h2>❌ รายการที่ไม่ผ่าน</h2>
+    <div class="fail-list" id="failList"></div>
+  </div>
+  <div class="card">
+    <h2>📋 เกณฑ์การประเมิน</h2>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <span class="grade-badge grade-excellent">⭐ ดีมาก ≥ 90%</span>
+      <span class="grade-badge grade-standard">✅ มาตรฐาน ≥ 85%</span>
+      <span class="grade-badge grade-improve">⚠️ ปรับปรุง ≥ 70%</span>
+      <span class="grade-badge grade-urgent">🚨 แก้ไขเร่งด่วน &lt; 70%</span>
+    </div>
+  </div>
+  <div class="btn-row" style="margin-top:0">
+    <button class="btn-secondary" onclick="goToStep2()">← แก้ไขข้อมูล</button>
+    <button class="btn-secondary" onclick="window.print()">🖨 พิมพ์ผล</button>
+    <button class="btn-primary" onclick="resetAll()">+ ตรวจสาขาใหม่</button>
+  </div>
+</div>
+
+</div><!-- /wrapper -->
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span class="lb-close">✕</span>
+  <img id="lbImg" src="">
+  <div class="lb-caption" id="lbCaption"></div>
+</div>
+
+<script>
+// ─────────────── DATA ───────────────
+const SECTIONS = [
+  { code:'A', name:'Facilities', nameTH:'สิ่งอำนวยความสะดวก', weight:9 },
+  { code:'B', name:'Service Standard', nameTH:'มาตรฐานการบริการ', weight:11.3 },
+  { code:'C', name:'Raw, Prepared & Ready', nameTH:'วัตถุดิบ', weight:30 },
+  { code:'D', name:'Steak and Side dishes', nameTH:'สเต๊กและเครื่องเคียง', weight:15.8 },
+  { code:'E', name:'Spaghetti', nameTH:'สปาเก็ตตี้', weight:2.2 },
+  { code:'F', name:'Other Menu', nameTH:'เมนูอื่น', weight:11 },
+  { code:'G', name:'Dessert', nameTH:'ของหวาน', weight:1.5 },
+  { code:'H', name:'Drinks', nameTH:'เครื่องดื่ม', weight:3 },
+  { code:'I', name:'Equipment', nameTH:'อุปกรณ์', weight:9 },
+  { code:'J', name:'Hygiene & Chemical', nameTH:'สุขอนามัย/สารเคมี', weight:4 },
+  { code:'K', name:'Operations', nameTH:'การจัดการ', weight:3.2 },
+];
+
+const ITEMS = [
+  // A
+  {no:1,sec:'A',text:'ป้ายและการตกแต่งภายนอกร้าน'},
+  {no:2,sec:'A',text:'ความสะอาดพื้น ผนัง เพดานภายในร้าน'},
+  {no:3,sec:'A',text:'ที่ตั้งเมนู / ตะกร้าใส่ซอสบนโต๊ะลูกค้า'},
+  {no:4,sec:'A',text:'โต๊ะและเก้าอี้ลูกค้า สภาพและความสะอาด'},
+  {no:5,sec:'A',text:'แสงสว่างภายในร้าน'},
+  {no:6,sec:'A',text:'เครื่องปรับอากาศ/พัดลม สภาพและความสะอาด'},
+  {no:7,sec:'A',text:'ห้องน้ำ ความสะอาดและน้ำยาล้างมือ'},
+  {no:8,sec:'A',text:'ถังขยะมีฝาปิด จัดวางเป็นระเบียบ'},
+  {no:9,sec:'A',text:'Drink Station — ความสะอาดเคาน์เตอร์และอุปกรณ์'},
+  {no:10,sec:'A',text:'Drink Station — ตู้เย็นและอุณหภูมิการเก็บรักษา'},
+  {no:11,sec:'A',text:'Drink Station — วัตถุดิบมีการระบุวันหมดอายุ'},
+  {no:12,sec:'A',text:'Serving Station — ตะกร้าและถาดเสิร์ฟ'},
+  {no:13,sec:'A',text:'Serving Station — อุปกรณ์เสิร์ฟ (ที่คีบ, ช้อน)'},
+  {no:14,sec:'A',text:'BOH — ความสะอาดพื้นที่ครัว'},
+  {no:15,sec:'A',text:'BOH — โต๊ะเตรียมอาหาร สภาพและความสะอาด'},
+  {no:16,sec:'A',text:'BOH — ตู้เย็น/ตู้แช่ สภาพภายนอก'},
+  {no:17,sec:'A',text:'BOH — อุณหภูมิตู้แช่เย็น (0–4°C)'},
+  {no:18,sec:'A',text:'BOH — อุณหภูมิตู้แช่แข็ง (≤ -18°C)'},
+  {no:19,sec:'A',text:'BOH — การจัดเรียงวัตถุดิบ FIFO/FEFO'},
+  {no:20,sec:'A',text:'ห้องสต็อก — ความเป็นระเบียบและความสะอาด'},
+  {no:21,sec:'A',text:'ห้องสต็อก — สินค้าแห้งไม่สัมผัสพื้น (≥15 ซม.)'},
+  {no:22,sec:'A',text:'ห้องสต็อก — ไม่มีสิ่งของไม่เกี่ยวข้อง'},
+  {no:23,sec:'A',text:'การดูแลรักษาโดยรวม (Overall Maintenance)'},
+  // B
+  {no:24,sec:'B',text:'การแต่งกายพนักงานตามมาตรฐาน'},
+  {no:25,sec:'B',text:'การทักทายลูกค้าเมื่อเข้าร้าน'},
+  {no:26,sec:'B',text:'การนำเมนูและอธิบายรายการอาหาร'},
+  {no:27,sec:'B',text:'ความรวดเร็วในการรับออเดอร์'},
+  {no:28,sec:'B',text:'ความถูกต้องของออเดอร์ที่รับ'},
+  {no:29,sec:'B',text:'เวลาเสิร์ฟตามมาตรฐาน'},
+  {no:30,sec:'B',text:'การนำเสนออาหารตามมาตรฐาน'},
+  {no:31,sec:'B',text:'การดูแลลูกค้าระหว่างรับประทานอาหาร'},
+  {no:32,sec:'B',text:'การเก็บจาน/เติมน้ำ'},
+  {no:33,sec:'B',text:'การเรียกเก็บเงินและกล่าวลาลูกค้า'},
+  {no:34,sec:'B',text:'ความรู้เรื่องเมนู (Menu Knowledge)'},
+  {no:35,sec:'B',text:'การจัดการข้อร้องเรียนลูกค้า'},
+  {no:36,sec:'B',text:'ป้ายราคาและโปรโมชั่นถูกต้องเป็นปัจจุบัน'},
+  {no:37,sec:'B',text:'ความสะอาดโต๊ะก่อนลูกค้านั่ง'},
+  {no:38,sec:'B',text:'การจัดโต๊ะตามมาตรฐาน (Table Setting)'},
+  // C
+  {no:39,sec:'C',text:'วัตถุดิบสดมีวันหมดอายุและอยู่ในสภาพดี'},
+  {no:40,sec:'C',text:'การละลายวัตถุดิบแช่แข็งถูกวิธี'},
+  {no:41,sec:'C',text:'วัตถุดิบที่เตรียมแล้วมีฉลากและวัน DRE ชัดเจน'},
+  {no:42,sec:'C',text:'การแยกเก็บวัตถุดิบดิบและสุก (Cross-contamination)'},
+  {no:43,sec:'C',text:'วัตถุดิบในภาชนะปิดสนิทและสะอาด'},
+  {no:44,sec:'C',text:'อุณหภูมิวัตถุดิบแช่เย็นอยู่ในเกณฑ์ (0–4°C)'},
+  {no:45,sec:'C',text:'ไม่พบวัตถุดิบหมดอายุจากฉลากสินค้า'},
+  {no:46,sec:'C',text:'ไม่พบวัตถุดิบหมดอายุจาก DRE การเตรียม'},
+  {no:47,sec:'C',text:'ไม่พบวัตถุดิบหมดอายุจาก DRE ละลาย'},
+  {no:48,sec:'C',text:'ไม่พบวัตถุดิบใช้วันต่อวันค้างข้ามวัน'},
+  {no:49,sec:'C',text:'FEFO/FIFO ปฏิบัติถูกต้อง'},
+  {no:50,sec:'C',text:'ปริมาณการเตรียมวัตถุดิบเหมาะสม'},
+  {no:51,sec:'C',text:'วัตถุดิบประเภทเนื้อสัตว์ — สภาพและการเก็บรักษา'},
+  {no:52,sec:'C',text:'วัตถุดิบประเภทปลาและอาหารทะเล'},
+  {no:53,sec:'C',text:'วัตถุดิบประเภทกึ่งสำเร็จรูป / Frozen'},
+  {no:54,sec:'C',text:'ซอสและน้ำจิ้ม — วันหมดอายุและการเก็บรักษา'},
+  {no:55,sec:'C',text:'ของแห้ง — การจัดเก็บและวันหมดอายุ'},
+  {no:56,sec:'C',text:'ผักและผลไม้ — สภาพและความสด'},
+  {no:57,sec:'C',text:'ขนมปัง — สภาพและวันหมดอายุ'},
+  {no:58,sec:'C',text:'Butter/Oil/Cheese — การเก็บรักษา'},
+  {no:59,sec:'C',text:'อุณหภูมิภายในครัวเป็นไปตามมาตรฐาน'},
+  {no:60,sec:'C',text:'การจัดเรียงสินค้าในตู้แช่ถูกหมวดหมู่'},
+  {no:61,sec:'C',text:'ภาชนะใส่วัตถุดิบมีความสะอาด'},
+  {no:62,sec:'C',text:'การบันทึกอุณหภูมิประจำวันครบถ้วน'},
+  {no:63,sec:'C',text:'ไม่พบสินค้าที่หมดอายุจากลักษณะกายภาพ'},
+  {no:64,sec:'C',text:'การรับวัตถุดิบตรวจสอบก่อนรับ'},
+  {no:65,sec:'C',text:'วัตถุดิบที่ใช้ประจำวันเตรียมพอดีกับยอดขาย'},
+  {no:66,sec:'C',text:'การทำความสะอาดภาชนะก่อนนำวัตถุดิบใส่'},
+  {no:67,sec:'C',text:'สินค้าในสต็อกตรงกับระบบ'},
+  {no:68,sec:'C',text:'ไม่พบสิ่งปนเปื้อนในวัตถุดิบ'},
+  {no:69,sec:'C',text:'การระบุ Lot / Batch ของวัตถุดิบที่รับ'},
+  {no:70,sec:'C',text:'การทิ้งวัตถุดิบที่ไม่ผ่านมาตรฐานทันที'},
+  {no:71,sec:'C',text:'บันทึกการทิ้งวัตถุดิบครบถ้วน'},
+  {no:72,sec:'C',text:'วัตถุดิบไม่สัมผัสพื้นโดยตรง'},
+  {no:73,sec:'C',text:'การจัดการวัตถุดิบส่วนเกินถูกต้อง'},
+  {no:74,sec:'C',text:'ไม่พบสัตว์รบกวนในพื้นที่จัดเก็บวัตถุดิบ'},
+  // D
+  {no:75,sec:'D',text:'สเต๊กหมักถูกต้องตามสูตร (Marinade)'},
+  {no:76,sec:'D',text:'อุณหภูมิการย่างสเต๊ก (Internal Temp)'},
+  {no:77,sec:'D',text:'การตัดสเต๊กและ Presentation ตามมาตรฐาน'},
+  {no:78,sec:'D',text:'ซอสสเต๊กตามสูตรและอุณหภูมิเสิร์ฟ'},
+  {no:79,sec:'D',text:'Side dish ตามมาตรฐาน (ผัก, มันบด, มันทอด)'},
+  {no:80,sec:'D',text:'น้ำหนักสเต๊กก่อนและหลังย่างตามมาตรฐาน'},
+  {no:81,sec:'D',text:'ระดับความสุกตามที่ลูกค้าสั่ง'},
+  {no:82,sec:'D',text:'การจัดจานตามมาตรฐาน Plating'},
+  {no:83,sec:'D',text:'อุณหภูมิจานก่อนเสิร์ฟ (ร้อน)'},
+  {no:84,sec:'D',text:'ซอสครีมมัสตาร์ด/เห็ด ตามสูตร'},
+  {no:85,sec:'D',text:'มันฝรั่งทอด — สี กรอบ อุณหภูมิ'},
+  {no:86,sec:'D',text:'มันบด — เนื้อสัมผัสและรสชาติ'},
+  {no:87,sec:'D',text:'ผักนึ่ง/ผัด — สีสดและไม่เกินสุก'},
+  {no:88,sec:'D',text:'ขนมปัง Garlic Toast ตามมาตรฐาน'},
+  {no:89,sec:'D',text:'เวลาออกอาหารหมวด D ตามมาตรฐาน'},
+  {no:90,sec:'D',text:'การจัดเตรียม Mise en Place ก่อนเปิดร้าน'},
+  {no:91,sec:'D',text:'น้ำมันทอดสะอาดและได้คุณภาพ'},
+  {no:92,sec:'D',text:'เตาย่างสะอาดก่อนใช้งาน'},
+  {no:93,sec:'D',text:'การจัดเก็บสเต๊กหมักในตู้เย็นถูกต้อง'},
+  // E
+  {no:94,sec:'E',text:'เส้นสปาเก็ตตี้ — เนื้อสัมผัส (al dente)'},
+  {no:95,sec:'E',text:'ซอสสปาเก็ตตี้ตามสูตร'},
+  {no:96,sec:'E',text:'Presentation ตามมาตรฐาน'},
+  {no:97,sec:'E',text:'เวลาออกอาหารตามมาตรฐาน'},
+  // F
+  {no:98,sec:'F',text:'ไก่ทอด — สีและความกรอบ'},
+  {no:99,sec:'F',text:'ปลาทอด — สภาพและ Presentation'},
+  {no:100,sec:'F',text:'ข้าวผัด — รสชาติและ Presentation'},
+  {no:101,sec:'F',text:'ซุป/ต้มยำ — รสชาติตามมาตรฐาน'},
+  {no:102,sec:'F',text:'สลัด — วัตถุดิบสดและ Dressing'},
+  {no:103,sec:'F',text:'ข้าว/เส้น — หุงสุกพอดี'},
+  {no:104,sec:'F',text:'อาหารเด็ก (Kid Menu) — ตามมาตรฐาน'},
+  {no:105,sec:'F',text:'เมนูพิเศษประจำเดือน (Seasonal)'},
+  {no:106,sec:'F',text:'Set Menu — ครบตามที่กำหนด'},
+  {no:107,sec:'F',text:'Starter/Appetizer — สดและตามมาตรฐาน'},
+  {no:108,sec:'F',text:'ขนมปัง — อบสดและอุณหภูมิเสิร์ฟ'},
+  {no:109,sec:'F',text:'ซอสประกอบ — ตามสูตรและปริมาณ'},
+  {no:110,sec:'F',text:'การ Garnish ตามมาตรฐาน'},
+  {no:111,sec:'F',text:'เวลาออกอาหารหมวด F ตามมาตรฐาน'},
+  {no:112,sec:'F',text:'Portion Size ตามมาตรฐาน'},
+  {no:113,sec:'F',text:'อุณหภูมิอาหารก่อนเสิร์ฟ'},
+  {no:114,sec:'F',text:'ความสม่ำเสมอของรสชาติ'},
+  {no:115,sec:'F',text:'ไม่พบสิ่งปนเปื้อนในอาหาร'},
+  {no:116,sec:'F',text:'การจัดเตรียม Mise en Place ครบถ้วน'},
+  {no:117,sec:'F',text:'บรรจุภัณฑ์ takeaway ตามมาตรฐาน'},
+  // G
+  {no:118,sec:'G',text:'ของหวาน — Presentation ตามมาตรฐาน'},
+  {no:119,sec:'G',text:'ไอศกรีม — อุณหภูมิการเก็บรักษา'},
+  {no:120,sec:'G',text:'เค้ก/พาย — วันหมดอายุและสภาพ'},
+  {no:121,sec:'G',text:'เวลาออกของหวานตามมาตรฐาน'},
+  // H
+  {no:122,sec:'H',text:'น้ำดื่ม — สะอาดและอุณหภูมิเหมาะสม'},
+  {no:123,sec:'H',text:'น้ำผลไม้/Smoothie — ตามสูตรและสด'},
+  {no:124,sec:'H',text:'กาแฟ/ชา — คุณภาพตามมาตรฐาน'},
+  {no:125,sec:'H',text:'น้ำอัดลม — อุณหภูมิและ Presentation'},
+  {no:126,sec:'H',text:'แก้วและอุปกรณ์ดื่ม — สะอาดไม่มีรอย'},
+  {no:127,sec:'H',text:'Ice ใช้น้ำแข็งสะอาด ไม่มีกลิ่น'},
+  {no:128,sec:'H',text:'เวลาเสิร์ฟเครื่องดื่มตามมาตรฐาน'},
+  {no:129,sec:'H',text:'Menu เครื่องดื่มครบถ้วนพร้อมขาย'},
+  // I
+  {no:130,sec:'I',text:'เตาย่างสเต๊ก — สภาพและความสะอาด'},
+  {no:131,sec:'I',text:'เตาแก๊ส — หัวเตาและตัวควบคุมไฟ'},
+  {no:132,sec:'I',text:'หม้อทอด (Fryer) — น้ำมันและความสะอาด'},
+  {no:133,sec:'I',text:'ไมโครเวฟ — ความสะอาดภายใน'},
+  {no:134,sec:'I',text:'เครื่องผสม/Blender — ความสะอาด'},
+  {no:135,sec:'I',text:'มีดและอุปกรณ์ตัด — สภาพและการเก็บรักษา'},
+  {no:136,sec:'I',text:'เขียง — แยกสีตามประเภทอาหาร'},
+  {no:137,sec:'I',text:'ถาดและภาชนะ — ไม่มีรอยแตกหรือสนิม'},
+  {no:138,sec:'I',text:'เครื่องล้างจาน — สภาพและการใช้งาน'},
+  {no:139,sec:'I',text:'ตู้แช่เย็น/แช่แข็ง — ซีลยางประตูสมบูรณ์'},
+  {no:140,sec:'I',text:'เทอร์โมมิเตอร์ — มีและใช้งานได้'},
+  {no:141,sec:'I',text:'ถังขยะในครัว — ฝาปิดและสะอาด'},
+  {no:142,sec:'I',text:'ก๊อกน้ำและอ่างล้างมือ — ใช้งานได้ปกติ'},
+  {no:143,sec:'I',text:'เครื่องบันทึกอุณหภูมิ (Logger) — ทำงานปกติ'},
+  {no:144,sec:'I',text:'เครื่องชั่ง — ได้มาตรฐาน'},
+  {no:145,sec:'I',text:'ไฟฉุกเฉิน/ถังดับเพลิง — พร้อมใช้งาน'},
+  {no:146,sec:'I',text:'ท่อระบายน้ำ — ไม่อุดตัน'},
+  {no:147,sec:'I',text:'ฮู้ดดูดควัน — สะอาดและใช้งานได้'},
+  {no:148,sec:'I',text:'เครื่อง POS — สภาพและการใช้งาน'},
+  {no:149,sec:'I',text:'ระบบ CCTV — ทำงานครบทุกจุด'},
+  {no:150,sec:'I',text:'เครื่องทำน้ำแข็ง — สะอาดและผลิตพอ'},
+  {no:151,sec:'I',text:'อุปกรณ์ PPE พนักงานครัว — ครบถ้วน'},
+  {no:152,sec:'I',text:'หน้าจอแสดงออเดอร์ครัว — ทำงานปกติ'},
+  {no:153,sec:'I',text:'อุปกรณ์เสิร์ฟ — เพียงพอและสะอาด'},
+  // J
+  {no:154,sec:'J',text:'แผนการทำความสะอาดประจำวัน/สัปดาห์/เดือน'},
+  {no:155,sec:'J',text:'บันทึกการล้างทำความสะอาดเตา/อุปกรณ์'},
+  {no:156,sec:'J',text:'น้ำยาเคมีมีฉลาก SDS และจัดเก็บถูกต้อง'},
+  {no:157,sec:'J',text:'ความเข้มข้นสารละลายล้างจาน (Sanitizer)'},
+  {no:158,sec:'J',text:'การล้างมือพนักงาน (ขั้นตอนและเวลา)'},
+  {no:159,sec:'J',text:'สารเคมีแยกเก็บห่างจากอาหาร'},
+  {no:160,sec:'J',text:'การจัดการแมลงและสัตว์รบกวน (Pest Control)'},
+  {no:161,sec:'J',text:'การกำจัดน้ำมันพืชใช้แล้ว (Waste Oil)'},
+  // K
+  {no:162,sec:'K',text:'มี SOP และพนักงานปฏิบัติตาม'},
+  {no:163,sec:'K',text:'การ Briefing พนักงานก่อนเปิดร้าน'},
+  {no:164,sec:'K',text:'การบันทึกยอดขายและสต็อกประจำวัน'},
+  {no:165,sec:'K',text:'การรายงานปัญหาต่อหัวหน้าทันที'},
+  {no:166,sec:'K',text:'แผนการเปิด-ปิดร้านตามมาตรฐาน'},
+  {no:167,sec:'K',text:'การอบรมพนักงานใหม่ตามกำหนด'},
+];
+
+// ─────────────── STATE ───────────────
+let answers = {}; // { itemNo: 'pass'|'fail' }
+let remarks  = {}; // { itemNo: 'text' }
+let photos   = {}; // { itemNo: [{dataUrl, name}] }
+let currentSec = 'A';
+let chartInstance = null;
+
+// ─────────────── INIT ───────────────
+document.getElementById('auditDate').value = new Date().toISOString().split('T')[0];
+
+// ─────────────── STEP NAVIGATION ───────────────
+function goToStep1() {
+  setStep(1);
+}
+function goToStep2() {
+  const branch = document.getElementById('branchCode').value;
+  const inspector = document.getElementById('inspector').value.trim();
+  if (!branch || !inspector) {
+    alert('กรุณาเลือกสาขาและกรอกชื่อผู้ตรวจก่อนครับ');
+    return;
+  }
+  buildChecklist();
+  setStep(2);
+}
+function goToStep3() {
+  buildDashboard();
+  setStep(3);
+}
+function setStep(n) {
+  document.querySelectorAll('.step-page').forEach(p => p.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+  document.getElementById('stepInfo').textContent = `ขั้นตอน ${n}/3`;
+  document.getElementById('progressBar').style.width = (n * 33.33) + '%';
+  document.getElementById('scoreLive').style.display = n === 2 ? 'flex' : 'none';
+  window.scrollTo(0, 0);
+}
+
+// ─────────────── BUILD CHECKLIST ───────────────
+function buildChecklist() {
+  // Section nav
+  const nav = document.getElementById('sectionNav');
+  nav.innerHTML = SECTIONS.map(s => `
+    <button class="sec-tab ${s.code===currentSec?'active':''}" id="stab-${s.code}" onclick="switchSection('${s.code}')">
+      ${s.code}
+    </button>
+  `).join('');
+  renderSection(currentSec);
+}
+
+function switchSection(code) {
+  currentSec = code;
+  document.querySelectorAll('.sec-tab').forEach(t => t.classList.remove('active'));
+  const tab = document.getElementById('stab-' + code);
+  if (tab) tab.classList.add('active');
+  renderSection(code);
+}
+
+function renderSection(code) {
+  const sec = SECTIONS.find(s => s.code === code);
+  const items = ITEMS.filter(i => i.sec === code);
+  const total = items.length;
+  const answered = items.filter(i => answers[i.no] !== undefined).length;
+  const failed = items.filter(i => answers[i.no] === 'fail').length;
+  const pct = answered === total ? ((total - failed) / total * 100).toFixed(1) : '—';
+
+  document.getElementById('sectionContent').innerHTML = `
+    <div class="section-header">
+      <div class="section-code-big">${code}</div>
+      <div>
+        <div class="sec-name">${sec.name}</div>
+        <div class="sec-meta">${sec.nameTH} · น้ำหนัก ${sec.weight} คะแนน</div>
+      </div>
+      <div class="sec-score-badge">${answered}/${total} · ${pct}%</div>
+    </div>
+    ${items.map(item => renderItem(item)).join('')}
+    <div class="btn-row">
+      ${code !== 'A' ? `<button class="btn-secondary" onclick="prevSection('${code}')">← หมวดก่อน</button>` : ''}
+      ${code !== 'K' ? `<button class="btn-primary" onclick="nextSection('${code}')">หมวดถัดไป →</button>` : ''}
+    </div>
+  `;
+}
+
+function renderItem(item) {
+  const ans = answers[item.no];
+  const rem = remarks[item.no] || '';
+  const isFail = ans === 'fail';
+  const itemPhotos = photos[item.no] || [];
+  const thumbsHtml = itemPhotos.map((p, idx) => `
+    <div class="photo-thumb" >
+      <img src="${p.dataUrl}" onclick="openLightbox('${p.dataUrl}','รายการ ${item.no}: ${item.text.replace(/'/g,"\\'")}')">
+      <button class="del-btn" onclick="removePhoto(${item.no},${idx})">✕</button>
+    </div>`).join('');
+  return `
+    <div class="checklist-item ${ans === 'pass' ? 'passed' : isFail ? 'failed' : ''}" id="item-${item.no}">
+      <div class="item-row">
+        <span class="item-num">${item.no}</span>
+        <span class="item-text">${item.text}</span>
+        <div class="toggle-group">
+          <button class="btn-pass ${ans === 'pass' ? 'active' : ''}" onclick="setAnswer(${item.no},'pass')">✓ ผ่าน</button>
+          <button class="btn-fail ${isFail ? 'active' : ''}" onclick="setAnswer(${item.no},'fail')">✗ ไม่ผ่าน</button>
+        </div>
+      </div>
+      <input class="remark-input ${isFail ? 'show' : ''}" id="rem-${item.no}"
+        placeholder="📝 ระบุปัญหาที่พบ..."
+        value="${rem}"
+        oninput="setRemark(${item.no}, this.value)">
+      <div class="photo-area ${isFail ? 'show' : ''}">
+        <label class="photo-upload-btn">
+          📷 แนบรูป ${itemPhotos.length > 0 ? `(${itemPhotos.length} รูป)` : ''}
+          <input type="file" accept="image/*" multiple onchange="addPhoto(${item.no}, this.files)">
+        </label>
+        <div class="photo-thumbs">${thumbsHtml}</div>
+      </div>
+    </div>`;
+}
+
+function setAnswer(no, val) {
+  answers[no] = val;
+  if (val === 'pass') { delete remarks[no]; delete photos[no]; }
+  updateProgress();
+  // Re-render just this item
+  const item = ITEMS.find(i => i.no === no);
+  const el = document.getElementById('item-' + no);
+  if (el) el.outerHTML = renderItem(item);
+  updateSectionTab(item.sec);
+  updateSectionHeader(item.sec);
+}
+
+function setRemark(no, val) {
+  remarks[no] = val;
+}
+
+function updateSectionTab(code) {
+  const items = ITEMS.filter(i => i.sec === code);
+  const answered = items.filter(i => answers[i.no] !== undefined).length;
+  const failed = items.filter(i => answers[i.no] === 'fail').length;
+  const tab = document.getElementById('stab-' + code);
+  if (!tab) return;
+  tab.className = 'sec-tab';
+  if (code === currentSec) tab.classList.add('active');
+  else if (answered === items.length && failed > 0) tab.classList.add('has-fail');
+  else if (answered === items.length) tab.classList.add('done');
+}
+
+function updateSectionHeader(code) {
+  if (code !== currentSec) return;
+  const sec = SECTIONS.find(s => s.code === code);
+  const items = ITEMS.filter(i => i.sec === code);
+  const total = items.length;
+  const answered = items.filter(i => answers[i.no] !== undefined).length;
+  const failed = items.filter(i => answers[i.no] === 'fail').length;
+  const pct = answered === total ? ((total - failed) / total * 100).toFixed(1) : '—';
+  const badge = document.querySelector('.sec-score-badge');
+  if (badge) badge.textContent = `${answered}/${total} · ${pct}%`;
+}
+
+function updateProgress() {
+  const total = ITEMS.length;
+  const answered = ITEMS.filter(i => answers[i.no] !== undefined).length;
+  const failed = ITEMS.filter(i => answers[i.no] === 'fail').length;
+  document.getElementById('progressText').textContent = `กรอกแล้ว ${answered} / ${total} รายการ`;
+  document.getElementById('btnFinish').disabled = answered < total;
+
+  // live score
+  const score = calcScore();
+  document.getElementById('scoreLive').textContent = score.net.toFixed(2) + '%';
+}
+
+function nextSection(code) {
+  const idx = SECTIONS.findIndex(s => s.code === code);
+  if (idx < SECTIONS.length - 1) switchSection(SECTIONS[idx + 1].code);
+}
+function prevSection(code) {
+  const idx = SECTIONS.findIndex(s => s.code === code);
+  if (idx > 0) switchSection(SECTIONS[idx - 1].code);
+}
+
+// ─────────────── CALCULATE ───────────────
+function calcScore() {
+  let totalDeduct = 0;
+  const secResults = SECTIONS.map(s => {
+    const items = ITEMS.filter(i => i.sec === s.code);
+    const deduct = items.filter(i => answers[i.no] === 'fail').length;
+    const total = items.length;
+    const pct = total > 0 ? (total - deduct) / total * 100 : 100;
+    const deductPts = s.weight * (deduct / total);
+    const earned = s.weight - deductPts;
+    totalDeduct += deductPts;
+    return { ...s, total, deduct, pct, earned };
+  });
+  const raw = 100 - totalDeduct;
+  return { secResults, raw, net: raw, totalDeduct };
+}
+
+function getGrade(pct) {
+  if (pct >= 90) return { label:'⭐ ดีมาก (Excellence)', cls:'grade-excellent' };
+  if (pct >= 85) return { label:'✅ มาตรฐาน (Standard)', cls:'grade-standard' };
+  if (pct >= 70) return { label:'⚠️ ปรับปรุง (Improve)', cls:'grade-improve' };
+  return { label:'🚨 แก้ไขเร่งด่วน (Break Down)', cls:'grade-urgent' };
+}
+
+function getBarColor(pct) {
+  if (pct >= 90) return '#28a745';
+  if (pct >= 85) return '#17a2b8';
+  if (pct >= 70) return '#ffc107';
+  return '#dc3545';
+}
+
+// ─────────────── DASHBOARD ───────────────
+function buildDashboard() {
+  const { secResults, net } = calcScore();
+  const grade = getGrade(net);
+  const branch = document.getElementById('branchCode');
+  const branchName = branch.options[branch.selectedIndex].text;
+  const date = document.getElementById('auditDate').value;
+  const inspector = document.getElementById('inspector').value;
+  const manager = document.getElementById('manager').value;
+  const totalItems = ITEMS.length;
+  const totalFail = ITEMS.filter(i => answers[i.no] === 'fail').length;
+  const totalPass = totalItems - totalFail;
+
+  // Hero
+  document.getElementById('heroCard').innerHTML = `
+    <div class="score-circle">
+      <span class="num">${net.toFixed(2)}</span>
+      <span class="pct">%</span>
+    </div>
+    <div class="score-info">
+      <div style="color:#f5a623;font-size:13px;margin-bottom:4px">${branchName}</div>
+      <h1>ผลการตรวจสาขา</h1>
+      <div class="meta">
+        📅 ${date}<br>
+        👤 ผู้ตรวจ: ${inspector}<br>
+        🏪 ผู้จัดการ: ${manager || '—'}
+      </div>
+      <span class="grade-badge ${grade.cls}">${grade.label}</span>
+    </div>
+  `;
+
+  // KPI
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi t"><div class="val">${totalItems}</div><div class="lbl">รายการทั้งหมด</div></div>
+    <div class="kpi p"><div class="val">${totalPass}</div><div class="lbl">ผ่าน</div></div>
+    <div class="kpi f"><div class="val">${totalFail}</div><div class="lbl">ไม่ผ่าน</div></div>
+    <div class="kpi s"><div class="val">${net.toFixed(2)}%</div><div class="lbl">คะแนนสุทธิ</div></div>
+  `;
+
+  // Table
+  document.getElementById('resultTable').innerHTML = secResults.map(s => {
+    const color = getBarColor(s.pct);
+    return `<tr>
+      <td><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:5px;background:#1a1a2e;color:#f5a623;font-weight:800;font-size:12px">${s.code}</span></td>
+      <td>${s.name}</td>
+      <td style="text-align:center">${s.total}</td>
+      <td style="text-align:center;color:${s.deduct>0?'#dc3545':'#28a745'};font-weight:700">${s.deduct}</td>
+      <td style="text-align:center;font-weight:700;color:${color}">${s.pct.toFixed(1)}%</td>
+      <td><div class="bar-wrap"><div class="bar-fill" style="width:${s.pct}%;background:${color}"></div></div></td>
+      <td style="text-align:right;font-weight:700">${s.earned.toFixed(3)}</td>
+    </tr>`;
+  }).join('');
+
+  // Chart
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(document.getElementById('resultChart'), {
+    type: 'bar',
+    data: {
+      labels: secResults.map(s => s.code),
+      datasets: [{
+        data: secResults.map(s => s.pct),
+        backgroundColor: secResults.map(s => getBarColor(s.pct)),
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { min: 60, max: 100, ticks: { callback: v => v + '%' } } }
+    }
+  });
+
+  // Fail list
+  const failItems = ITEMS.filter(i => answers[i.no] === 'fail');
+  if (failItems.length === 0) {
+    document.getElementById('failCard').innerHTML = '<div style="color:#28a745;text-align:center;padding:20px;font-weight:700">🎉 ไม่มีรายการที่ไม่ผ่าน!</div>';
+  } else {
+    document.getElementById('failList').innerHTML = failItems.map(item => {
+    const itemPhotos = photos[item.no] || [];
+    const photosHtml = itemPhotos.length ? `
+      <div class="fail-photos">
+        ${itemPhotos.map(p => `
+          <div class="fail-photo-thumb">
+            <img src="${p.dataUrl}" onclick="openLightbox('${p.dataUrl}','รายการ ${item.no}: ${item.text.replace(/'/g,"\\'")}')">
+          </div>`).join('')}
+      </div>` : '';
+    return `
+      <div class="fail-item">
+        <div class="fi-num">รายการ ${item.no} · หมวด ${item.sec}</div>
+        <div>${item.text}</div>
+        ${remarks[item.no] ? `<div class="fi-remark">📝 ${remarks[item.no]}</div>` : ''}
+        ${photosHtml}
+      </div>`;
+  }).join('');
+  }
+}
+
+// ─────────────── PHOTO FUNCTIONS ───────────────
+function addPhoto(no, files) {
+  if (!photos[no]) photos[no] = [];
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      photos[no].push({ dataUrl: e.target.result, name: file.name });
+      // Re-render item
+      const item = ITEMS.find(i => i.no === no);
+      const el = document.getElementById('item-' + no);
+      if (el) el.outerHTML = renderItem(item);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removePhoto(no, idx) {
+  if (photos[no]) {
+    photos[no].splice(idx, 1);
+    if (photos[no].length === 0) delete photos[no];
+  }
+  const item = ITEMS.find(i => i.no === no);
+  const el = document.getElementById('item-' + no);
+  if (el) el.outerHTML = renderItem(item);
+}
+
+function openLightbox(src, caption) {
+  document.getElementById('lbImg').src = src;
+  document.getElementById('lbCaption').textContent = caption;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+function resetAll() {
+  answers = {};
+  remarks = {};
+  photos  = {};
+  currentSec = 'A';
+  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+  document.getElementById('branchCode').value = '';
+  document.getElementById('inspector').value = '';
+  document.getElementById('manager').value = '';
+  document.getElementById('serviceStaff').value = '';
+  document.getElementById('kitchenStaff').value = '';
+  document.getElementById('auditDate').value = new Date().toISOString().split('T')[0];
+  setStep(1);
+}
+</script>
+</body>
+</html>
