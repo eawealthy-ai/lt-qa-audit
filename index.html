@@ -11,26 +11,17 @@
 <script id="tailwind-config">
 tailwind.config = {
   darkMode:"class",
-  theme:{
-    extend:{
-      colors:{
-        "inverse-surface":"#3d2d26","surface-dim":"#efd5ca",
-        "on-primary":"#ffffff","error":"#ba1a1a",
-        "on-surface":"#261812","primary":"#a04100",
-        "surface-container-highest":"#f8ddd2","background":"#fff8f6",
-        "surface-container-lowest":"#ffffff","on-primary-fixed":"#351000",
-        "primary-fixed":"#ffdbcc","error-container":"#ffdad6",
-        "secondary":"#003ec6","surface-container":"#ffeae1",
-        "primary-fixed-dim":"#ffb693","on-surface-variant":"#5a4136",
-        "secondary-container":"#0052fe","outline":"#8e7164",
-        "surface":"#fff8f6","outline-variant":"#e2bfb0",
-        "surface-container-low":"#fff1eb","surface-container-high":"#fee3d8",
-        "on-background":"#261812","primary-container":"#ff6b00",
-      },
-      borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},
-      fontFamily:{"headline":["Noto Serif"],"body":["Manrope"],"label":["Manrope"]}
-    }
-  }
+  theme:{extend:{colors:{
+    "inverse-surface":"#3d2d26","surface-dim":"#efd5ca","on-primary":"#ffffff","error":"#ba1a1a",
+    "on-surface":"#261812","primary":"#a04100","surface-container-highest":"#f8ddd2","background":"#fff8f6",
+    "surface-container-lowest":"#ffffff","on-primary-fixed":"#351000","primary-fixed":"#ffdbcc",
+    "error-container":"#ffdad6","secondary":"#003ec6","surface-container":"#ffeae1",
+    "primary-fixed-dim":"#ffb693","on-surface-variant":"#5a4136","secondary-container":"#0052fe",
+    "outline":"#8e7164","surface":"#fff8f6","outline-variant":"#e2bfb0",
+    "surface-container-low":"#fff1eb","surface-container-high":"#fee3d8",
+    "on-background":"#261812","primary-container":"#ff6b00",
+  },borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},
+  fontFamily:{"headline":["Noto Serif"],"body":["Manrope"],"label":["Manrope"]}}}
 }
 </script>
 <style>
@@ -41,18 +32,118 @@ tailwind.config = {
   .grad-btn{background:linear-gradient(90deg,#FF6B00,#0052FF)}
   .grad-btn:hover{opacity:.9}
   .sidebar-grad{background:linear-gradient(180deg,#FF6B00 0%,#0052FF 100%)}
-  /* Lightbox */
-  .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center}
+  .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;align-items:center;justify-content:center}
   .lightbox.open{display:flex}
+  input[type=password]::-ms-reveal{display:none}
 </style>
 </head>
 <body class="bg-surface text-on-surface min-h-screen">
 
-<!-- ═══ SIDEBAR ═══ -->
+<!-- ══════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════ -->
+<div id="loginScreen" class="fixed inset-0 z-[200] flex">
+  <!-- Left gradient panel -->
+  <div class="hidden lg:flex w-1/2 flex-col justify-between p-14" style="background:linear-gradient(160deg,#FF6B00 0%,#0052FF 100%)">
+    <div>
+      <h1 class="font-['Noto_Serif'] text-4xl font-black text-white leading-tight mb-3">LT QA Audit</h1>
+      <p class="text-white/70 text-sm tracking-widest uppercase font-['Manrope']">Branch Inspection System</p>
+    </div>
+    <div class="space-y-6">
+      <div class="bg-white/10 backdrop-blur rounded-sm p-5">
+        <p class="text-[10px] uppercase tracking-widest text-white/60 font-bold mb-3">ระบบนี้ครอบคลุม</p>
+        <div class="space-y-2">
+          <div class="flex items-center gap-3 text-white text-sm"><span class="material-symbols-outlined text-base filled">check_circle</span>Checklist 167 รายการ · 11 หมวด</div>
+          <div class="flex items-center gap-3 text-white text-sm"><span class="material-symbols-outlined text-base filled">check_circle</span>บันทึกรูปภาพหลักฐาน</div>
+          <div class="flex items-center gap-3 text-white text-sm"><span class="material-symbols-outlined text-base filled">check_circle</span>Dashboard สรุปผลอัตโนมัติ</div>
+          <div class="flex items-center gap-3 text-white text-sm"><span class="material-symbols-outlined text-base filled">check_circle</span>พิมพ์รายงานได้ทันที</div>
+        </div>
+      </div>
+      <p class="text-white/40 text-xs font-['Manrope']">FAB Holdings · QA Division · 2026</p>
+    </div>
+  </div>
+  <!-- Right login form -->
+  <div class="flex-1 bg-surface flex items-center justify-center p-8">
+    <div class="w-full max-w-sm">
+      <!-- Logo (mobile) -->
+      <div class="lg:hidden mb-8 text-center">
+        <h1 class="font-['Noto_Serif'] text-3xl font-black text-primary">LT QA Audit</h1>
+        <p class="text-outline text-xs tracking-widest uppercase mt-1">Branch Inspection System</p>
+      </div>
+      <div class="bg-surface-container-lowest rounded-lg p-8" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.12)">
+        <div class="flex items-center gap-3 mb-8">
+          <div class="w-10 h-10 rounded-sm flex items-center justify-center" style="background:linear-gradient(135deg,#FF6B00,#0052FF)">
+            <span class="material-symbols-outlined filled text-white text-xl">lock</span>
+          </div>
+          <div>
+            <h2 class="font-black text-base serif text-on-surface">เข้าสู่ระบบ</h2>
+            <p class="text-[10px] text-outline uppercase tracking-wider">QA Inspector Login</p>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">รหัสพนักงาน (Employee No.)</label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-3 text-outline text-lg">badge</span>
+              <input type="text" id="loginUser" placeholder="เช่น 123456" maxlength="20"
+                class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-sm py-3 pl-10 pr-4 text-sm outline-none transition-colors font-['Manrope']"
+                onkeydown="if(event.key==='Enter') doLogin()"/>
+            </div>
+          </div>
+          <div>
+            <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">รหัสผ่าน (Password)</label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-3 text-outline text-lg">key</span>
+              <input type="password" id="loginPass" placeholder="••••••"
+                class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-sm py-3 pl-10 pr-10 text-sm outline-none transition-colors font-['Manrope']"
+                onkeydown="if(event.key==='Enter') doLogin()"/>
+              <button type="button" onclick="togglePass()" class="absolute right-3 top-3">
+                <span class="material-symbols-outlined text-outline text-lg" id="passEye">visibility</span>
+              </button>
+            </div>
+          </div>
+          <!-- Error -->
+          <div id="loginErr" class="hidden bg-error-container text-error text-xs font-bold rounded-sm px-4 py-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-base">error</span>
+            <span id="loginErrMsg">รหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง</span>
+          </div>
+          <button onclick="doLogin()" class="grad-btn w-full text-white font-bold text-sm uppercase tracking-widest py-3.5 rounded-sm flex items-center justify-center gap-2 transition-all mt-2">
+            <span class="material-symbols-outlined text-xl">login</span> เข้าสู่ระบบ
+          </button>
+        </div>
+        <!-- Demo hint -->
+        <div class="mt-6 bg-primary-fixed rounded-sm p-4">
+          <p class="text-[10px] uppercase tracking-widest font-bold text-on-primary-fixed mb-2">Demo Account</p>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div><span class="text-outline">รหัสพนักงาน</span><br><span class="font-black text-on-surface">123456</span></div>
+            <div><span class="text-outline">รหัสผ่าน</span><br><span class="font-black text-on-surface">1234</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MAIN APP (hidden until login)
+══════════════════════════════════════ -->
+<div id="mainApp" class="hidden">
+
+<!-- SIDEBAR -->
 <aside class="sidebar-grad h-screen w-64 fixed left-0 top-0 flex flex-col py-8 shadow-2xl z-50">
-  <div class="px-7 mb-10">
+  <div class="px-7 mb-8">
     <h1 class="font-['Noto_Serif'] text-xl font-black text-white leading-tight">LT QA Audit</h1>
     <p class="font-['Manrope'] text-[10px] tracking-widest font-medium uppercase text-white/60 mt-1">Branch Inspection System</p>
+  </div>
+  <!-- User badge -->
+  <div class="mx-3 mb-6 bg-white/15 rounded-sm px-4 py-3 flex items-center gap-3">
+    <div class="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center flex-shrink-0">
+      <span class="material-symbols-outlined filled text-white text-base">account_circle</span>
+    </div>
+    <div class="min-w-0">
+      <p class="text-white text-xs font-bold truncate" id="sidebarUser">—</p>
+      <p class="text-white/50 text-[10px] uppercase tracking-widest">QA Inspector</p>
+    </div>
   </div>
   <nav class="flex-1 space-y-0.5 px-3">
     <button onclick="setStep(1)" id="snav-1" class="w-full text-left bg-white/20 border-l-4 border-white text-white font-bold py-3.5 px-5 flex items-center gap-3 transition-all rounded-sm">
@@ -74,12 +165,14 @@ tailwind.config = {
     <p class="text-3xl font-black text-white font-['Noto_Serif']" id="scoreLive">—</p>
     <div class="h-1 bg-white/20 rounded-full mt-2"><div class="h-1 bg-white rounded-full transition-all" id="scoreLiveBar" style="width:0%"></div></div>
   </div>
-  <div class="px-5 pt-4 border-t border-white/10">
-    <p class="text-white/40 text-[10px] uppercase tracking-widest">FAB Holdings · QA Division</p>
+  <div class="px-3 pt-4 border-t border-white/10">
+    <button onclick="doLogout()" class="w-full flex items-center gap-3 text-white/60 hover:text-white hover:bg-white/10 px-4 py-3 rounded-sm transition-all text-xs uppercase tracking-widest font-bold">
+      <span class="material-symbols-outlined text-base">logout</span> ออกจากระบบ
+    </button>
   </div>
 </aside>
 
-<!-- ═══ TOP BAR ═══ -->
+<!-- TOP BAR -->
 <header class="flex justify-between items-center px-10 h-16 fixed top-0 right-0 left-64 bg-white/80 backdrop-blur-[40px] z-40 shadow-sm">
   <div>
     <h2 class="font-['Noto_Serif'] text-lg font-black text-primary" id="topBarTitle">Branch Information</h2>
@@ -93,52 +186,38 @@ tailwind.config = {
   </div>
 </header>
 
-<!-- ═══ MAIN CANVAS ═══ -->
+<!-- MAIN CANVAS -->
 <main class="ml-64 pt-24 pb-16 px-10 max-w-[1400px]">
 
-<!-- ══════════ STEP 1: BRANCH INFO ══════════ -->
+<!-- ══ STEP 1: BRANCH INFO ══ -->
 <div class="step-page" id="step1">
   <div class="mb-8">
     <h3 class="text-2xl font-black serif text-on-surface mb-1">Branch Inspection Setup</h3>
     <p class="text-sm text-outline">กรอกข้อมูลสาขาและผู้ตรวจก่อนเริ่มกรอก checklist</p>
   </div>
   <div class="grid grid-cols-12 gap-6">
-    <!-- Form Card -->
     <div class="col-span-8 bg-surface-container-lowest rounded-lg p-8" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.08)">
       <div class="flex items-center gap-3 mb-6 pb-6 border-b border-outline-variant/20">
         <div class="w-10 h-10 flex items-center justify-center rounded-sm" style="background:linear-gradient(135deg,#FF6B00,#0052FF)">
           <span class="material-symbols-outlined filled text-white text-xl">store</span>
         </div>
-        <div>
-          <h3 class="font-black text-base serif">Branch Details</h3>
-          <p class="text-[10px] text-outline uppercase tracking-wider">ข้อมูลสาขา</p>
-        </div>
+        <div><h3 class="font-black text-base serif">Branch Details</h3><p class="text-[10px] text-outline uppercase tracking-wider">ข้อมูลสาขา</p></div>
       </div>
       <div class="grid grid-cols-2 gap-5">
         <div class="col-span-2">
           <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">สาขา / Branch</label>
           <select id="branchCode" class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-sm py-3 px-4 text-sm text-on-surface outline-none transition-colors font-['Manrope']">
             <option value="">— เลือกสาขา —</option>
-            <option value="5001">5001 — Fashion Island</option>
-            <option value="5002">5002 — Seacon Srinakarin</option>
-            <option value="5003">5003 — The Mall Thapra</option>
-            <option value="5004">5004 — CT Rattanathibet</option>
-            <option value="5005">5005 — The Mall Bangkapi</option>
-            <option value="5007">5007 — CT Rama 2</option>
-            <option value="5010">5010 — Passion Rayong</option>
-            <option value="5011">5011 — The Mall Ngamwongwan</option>
-            <option value="5012">5012 — LT Bangplee</option>
-            <option value="5013">5013 — Laemthong Bangsaen</option>
-            <option value="5014">5014 — Big C Extra Middle Pattaya</option>
-            <option value="5015">5015 — Pacific Park Sriracha</option>
-            <option value="5016">5016 — Imperial World Samrong</option>
-            <option value="5017">5017 — Seacon Bangkae</option>
-            <option value="5018">5018 — CT Ramintra</option>
-            <option value="5019">5019 — Terminal 21 Asok</option>
-            <option value="5023">5023 — Big C Extra South Pattaya</option>
-            <option value="5024">5024 — The Mall Bangkae</option>
-            <option value="5025">5025 — Big C Extra Srinakarin</option>
-            <option value="5049">5049 — LT Chonburi</option>
+            <option value="5001">5001 — Fashion Island</option><option value="5002">5002 — Seacon Srinakarin</option>
+            <option value="5003">5003 — The Mall Thapra</option><option value="5004">5004 — CT Rattanathibet</option>
+            <option value="5005">5005 — The Mall Bangkapi</option><option value="5007">5007 — CT Rama 2</option>
+            <option value="5010">5010 — Passion Rayong</option><option value="5011">5011 — The Mall Ngamwongwan</option>
+            <option value="5012">5012 — LT Bangplee</option><option value="5013">5013 — Laemthong Bangsaen</option>
+            <option value="5014">5014 — Big C Extra Middle Pattaya</option><option value="5015">5015 — Pacific Park Sriracha</option>
+            <option value="5016">5016 — Imperial World Samrong</option><option value="5017">5017 — Seacon Bangkae</option>
+            <option value="5018">5018 — CT Ramintra</option><option value="5019">5019 — Terminal 21 Asok</option>
+            <option value="5023">5023 — Big C Extra South Pattaya</option><option value="5024">5024 — The Mall Bangkae</option>
+            <option value="5025">5025 — Big C Extra Srinakarin</option><option value="5049">5049 — LT Chonburi</option>
           </select>
         </div>
         <div>
@@ -164,18 +243,14 @@ tailwind.config = {
       </div>
       <div class="mt-8 flex justify-end">
         <button onclick="goToStep2()" class="grad-btn text-white font-bold text-sm uppercase tracking-widest px-8 py-3 rounded-sm flex items-center gap-2 transition-all">
-          <span>เริ่มตรวจ</span>
-          <span class="material-symbols-outlined text-xl">arrow_forward</span>
+          เริ่มตรวจ <span class="material-symbols-outlined text-xl">arrow_forward</span>
         </button>
       </div>
     </div>
-    <!-- Info Panel -->
     <div class="col-span-4 space-y-4">
       <div class="bg-surface-container-lowest rounded-lg p-6" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.08)">
         <p class="text-[10px] uppercase tracking-widest font-bold text-outline mb-4">Sections Overview</p>
-        <div class="space-y-2">
-          <div id="sections-overview"></div>
-        </div>
+        <div id="sections-overview"></div>
       </div>
       <div class="rounded-lg p-6" style="background:linear-gradient(135deg,#FF6B00,#0052FF)">
         <p class="text-[10px] uppercase tracking-widest font-bold text-white/70 mb-3">Total Checklist Items</p>
@@ -186,13 +261,10 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ══════════ STEP 2: CHECKLIST ══════════ -->
+<!-- ══ STEP 2: CHECKLIST ══ -->
 <div class="step-page hidden" id="step2">
-  <!-- Section Tabs -->
   <div class="flex gap-2 flex-wrap mb-6" id="sectionNav"></div>
-  <!-- Content -->
   <div id="sectionContent"></div>
-  <!-- Sticky Footer -->
   <div class="fixed bottom-0 left-64 right-0 bg-white/90 backdrop-blur-[20px] border-t border-outline-variant/20 px-10 py-4 flex items-center justify-between z-40">
     <div class="flex items-center gap-4">
       <span class="material-symbols-outlined text-outline">check_circle</span>
@@ -212,13 +284,10 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ══════════ STEP 3: DASHBOARD ══════════ -->
+<!-- ══ STEP 3: DASHBOARD ══ -->
 <div class="step-page hidden" id="step3">
-  <!-- Hero -->
   <div class="rounded-lg p-8 mb-6 flex items-center gap-8" id="heroCard" style="background:linear-gradient(135deg,#1a1a2e,#16213e);box-shadow:0 12px 32px -4px rgba(38,24,18,0.15)"></div>
-  <!-- KPIs -->
   <div class="grid grid-cols-4 gap-5 mb-6" id="kpiGrid"></div>
-  <!-- Chart + Table -->
   <div class="grid grid-cols-12 gap-6 mb-6">
     <div class="col-span-7 bg-surface-container-lowest rounded-lg p-7" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.08)">
       <h3 class="text-xl font-black serif mb-1">Section Scores</h3>
@@ -231,13 +300,11 @@ tailwind.config = {
       <div class="space-y-3" id="resultTable"></div>
     </div>
   </div>
-  <!-- Fail Items -->
   <div class="bg-surface-container-lowest rounded-lg p-7 mb-6" id="failCard" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.08)">
     <h3 class="text-xl font-black serif mb-1">Non-Conformance Report</h3>
     <p class="text-xs text-outline mb-5 uppercase tracking-widest">รายการที่ไม่ผ่าน</p>
     <div id="failList"></div>
   </div>
-  <!-- Grade Legend -->
   <div class="bg-surface-container-lowest rounded-lg p-7 mb-6" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.08)">
     <p class="text-[10px] uppercase tracking-widest font-bold text-outline mb-4">เกณฑ์การประเมิน</p>
     <div class="flex gap-3 flex-wrap">
@@ -248,19 +315,14 @@ tailwind.config = {
     </div>
   </div>
   <div class="flex justify-end gap-3">
-    <button onclick="goToStep2()" class="bg-surface-container-low text-on-surface-variant text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-sm flex items-center gap-2">
-      <span class="material-symbols-outlined text-base">edit</span> แก้ไข
-    </button>
-    <button onclick="window.print()" class="bg-surface-container-low text-on-surface-variant text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-sm flex items-center gap-2">
-      <span class="material-symbols-outlined text-base">print</span> พิมพ์
-    </button>
-    <button onclick="resetAll()" class="grad-btn text-white text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-sm flex items-center gap-2">
-      <span class="material-symbols-outlined text-base">add</span> ตรวจสาขาใหม่
-    </button>
+    <button onclick="goToStep2()" class="bg-surface-container-low text-on-surface-variant text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-sm flex items-center gap-2"><span class="material-symbols-outlined text-base">edit</span> แก้ไข</button>
+    <button onclick="window.print()" class="bg-surface-container-low text-on-surface-variant text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-sm flex items-center gap-2"><span class="material-symbols-outlined text-base">print</span> พิมพ์</button>
+    <button onclick="resetAll()" class="grad-btn text-white text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-sm flex items-center gap-2"><span class="material-symbols-outlined text-base">add</span> ตรวจสาขาใหม่</button>
   </div>
 </div>
 
 </main>
+</div><!-- /mainApp -->
 
 <!-- Lightbox -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
@@ -270,7 +332,52 @@ tailwind.config = {
 </div>
 
 <script>
-// ─── DATA ───
+// ════════════ AUTH ════════════
+const USERS = {
+  '123456': '1234',
+};
+let currentUser = null;
+
+function doLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginErr');
+  if(!u || !p){ showErr('กรุณากรอกรหัสพนักงานและรหัสผ่าน'); return; }
+  if(USERS[u] && USERS[u]===p){
+    currentUser = u;
+    err.classList.add('hidden');
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    document.getElementById('sidebarUser').textContent = 'EMP · ' + u;
+    document.getElementById('auditDate').value = new Date().toISOString().split('T')[0];
+    initSectionsOverview();
+  } else {
+    showErr('รหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง');
+    document.getElementById('loginPass').value='';
+  }
+}
+function showErr(msg){
+  const err = document.getElementById('loginErr');
+  document.getElementById('loginErrMsg').textContent = msg;
+  err.classList.remove('hidden');
+}
+function doLogout(){
+  if(!confirm('ต้องการออกจากระบบ?\nข้อมูลที่ยังไม่ได้บันทึกจะหายไป')) return;
+  currentUser = null;
+  resetAll();
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+}
+function togglePass(){
+  const inp = document.getElementById('loginPass');
+  const eye = document.getElementById('passEye');
+  if(inp.type==='password'){ inp.type='text'; eye.textContent='visibility_off'; }
+  else { inp.type='password'; eye.textContent='visibility'; }
+}
+
+// ════════════ DATA ════════════
 const SECTIONS = [
   {code:'A',name:'Facilities',nameTH:'สิ่งอำนวยความสะดวก',weight:9,icon:'apartment'},
   {code:'B',name:'Service Standard',nameTH:'มาตรฐานการบริการ',weight:11.3,icon:'support_agent'},
@@ -284,7 +391,6 @@ const SECTIONS = [
   {code:'J',name:'Hygiene',nameTH:'สุขอนามัย',weight:4,icon:'sanitizer'},
   {code:'K',name:'Operations',nameTH:'การจัดการ',weight:3.2,icon:'settings'},
 ];
-
 const ITEMS = [
   {no:1,sec:'A',text:'ป้ายและการตกแต่งภายนอกร้าน'},{no:2,sec:'A',text:'ความสะอาดพื้น ผนัง เพดานภายในร้าน'},{no:3,sec:'A',text:'ที่ตั้งเมนู / ตะกร้าใส่ซอสบนโต๊ะลูกค้า'},{no:4,sec:'A',text:'โต๊ะและเก้าอี้ลูกค้า สภาพและความสะอาด'},{no:5,sec:'A',text:'แสงสว่างภายในร้าน'},{no:6,sec:'A',text:'เครื่องปรับอากาศ/พัดลม สภาพและความสะอาด'},{no:7,sec:'A',text:'ห้องน้ำ ความสะอาดและน้ำยาล้างมือ'},{no:8,sec:'A',text:'ถังขยะมีฝาปิด จัดวางเป็นระเบียบ'},{no:9,sec:'A',text:'Drink Station — ความสะอาดเคาน์เตอร์และอุปกรณ์'},{no:10,sec:'A',text:'Drink Station — ตู้เย็นและอุณหภูมิการเก็บรักษา'},{no:11,sec:'A',text:'Drink Station — วัตถุดิบมีการระบุวันหมดอายุ'},{no:12,sec:'A',text:'Serving Station — ตะกร้าและถาดเสิร์ฟ'},{no:13,sec:'A',text:'Serving Station — อุปกรณ์เสิร์ฟ (ที่คีบ, ช้อน)'},{no:14,sec:'A',text:'BOH — ความสะอาดพื้นที่ครัว'},{no:15,sec:'A',text:'BOH — โต๊ะเตรียมอาหาร สภาพและความสะอาด'},{no:16,sec:'A',text:'BOH — ตู้เย็น/ตู้แช่ สภาพภายนอก'},{no:17,sec:'A',text:'BOH — อุณหภูมิตู้แช่เย็น (0–4°C)'},{no:18,sec:'A',text:'BOH — อุณหภูมิตู้แช่แข็ง (≤ -18°C)'},{no:19,sec:'A',text:'BOH — การจัดเรียงวัตถุดิบ FIFO/FEFO'},{no:20,sec:'A',text:'ห้องสต็อก — ความเป็นระเบียบและความสะอาด'},{no:21,sec:'A',text:'ห้องสต็อก — สินค้าแห้งไม่สัมผัสพื้น (≥15 ซม.)'},{no:22,sec:'A',text:'ห้องสต็อก — ไม่มีสิ่งของไม่เกี่ยวข้อง'},{no:23,sec:'A',text:'การดูแลรักษาโดยรวม (Overall Maintenance)'},
   {no:24,sec:'B',text:'การแต่งกายพนักงานตามมาตรฐาน'},{no:25,sec:'B',text:'การทักทายลูกค้าเมื่อเข้าร้าน'},{no:26,sec:'B',text:'การนำเมนูและอธิบายรายการอาหาร'},{no:27,sec:'B',text:'ความรวดเร็วในการรับออเดอร์'},{no:28,sec:'B',text:'ความถูกต้องของออเดอร์ที่รับ'},{no:29,sec:'B',text:'เวลาเสิร์ฟตามมาตรฐาน'},{no:30,sec:'B',text:'การนำเสนออาหารตามมาตรฐาน'},{no:31,sec:'B',text:'การดูแลลูกค้าระหว่างรับประทานอาหาร'},{no:32,sec:'B',text:'การเก็บจาน/เติมน้ำ'},{no:33,sec:'B',text:'การเรียกเก็บเงินและกล่าวลาลูกค้า'},{no:34,sec:'B',text:'ความรู้เรื่องเมนู (Menu Knowledge)'},{no:35,sec:'B',text:'การจัดการข้อร้องเรียนลูกค้า'},{no:36,sec:'B',text:'ป้ายราคาและโปรโมชั่นถูกต้องเป็นปัจจุบัน'},{no:37,sec:'B',text:'ความสะอาดโต๊ะก่อนลูกค้านั่ง'},{no:38,sec:'B',text:'การจัดโต๊ะตามมาตรฐาน (Table Setting)'},
@@ -299,35 +405,31 @@ const ITEMS = [
   {no:162,sec:'K',text:'มี SOP และพนักงานปฏิบัติตาม'},{no:163,sec:'K',text:'การ Briefing พนักงานก่อนเปิดร้าน'},{no:164,sec:'K',text:'การบันทึกยอดขายและสต็อกประจำวัน'},{no:165,sec:'K',text:'การรายงานปัญหาต่อหัวหน้าทันที'},{no:166,sec:'K',text:'แผนการเปิด-ปิดร้านตามมาตรฐาน'},{no:167,sec:'K',text:'การอบรมพนักงานใหม่ตามกำหนด'},
 ];
 
-// ─── STATE ───
+// ════════════ STATE ════════════
 let answers={}, remarks={}, photos={}, currentSec='A', chartInstance=null;
 
-// ─── INIT ───
-document.getElementById('auditDate').value=new Date().toISOString().split('T')[0];
-document.getElementById('sections-overview').innerHTML=SECTIONS.map(s=>`
-  <div class="flex items-center justify-between py-1.5">
-    <div class="flex items-center gap-2">
-      <span class="material-symbols-outlined text-sm text-primary">${s.icon}</span>
-      <span class="text-xs font-bold text-on-surface">${s.code} · ${s.name}</span>
-    </div>
-    <span class="text-[10px] font-bold text-outline uppercase">${s.weight}pt</span>
-  </div>
-`).join('');
+function initSectionsOverview(){
+  document.getElementById('sections-overview').innerHTML=SECTIONS.map(s=>`
+    <div class="flex items-center justify-between py-1.5">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm text-primary">${s.icon}</span>
+        <span class="text-xs font-bold text-on-surface">${s.code} · ${s.name}</span>
+      </div>
+      <span class="text-[10px] font-bold text-outline uppercase">${s.weight}pt</span>
+    </div>`).join('');
+}
 
-// ─── NAVIGATION ───
+// ════════════ NAVIGATION ════════════
 function setStep(n){
   if(n===2 && !validateStep1()) return;
   if(n===3 && Object.keys(answers).length < ITEMS.length) return;
   [1,2,3].forEach(i=>{
-    document.getElementById('step'+i).classList.toggle('hidden', i!==n);
+    document.getElementById('step'+i).classList.toggle('hidden',i!==n);
     const sn=document.getElementById('snav-'+i);
     if(sn){
-      sn.classList.toggle('bg-white/20',i===n);
-      sn.classList.toggle('border-l-4',i===n);
-      sn.classList.toggle('border-white',i===n);
-      sn.classList.toggle('font-bold',i===n);
-      sn.classList.toggle('text-white',i===n);
-      sn.classList.toggle('text-white/60',i!==n);
+      sn.classList.toggle('bg-white/20',i===n); sn.classList.toggle('border-l-4',i===n);
+      sn.classList.toggle('border-white',i===n); sn.classList.toggle('font-bold',i===n);
+      sn.classList.toggle('text-white',i===n); sn.classList.toggle('text-white/60',i!==n);
     }
   });
   const titles=['','Branch Information','Inspection Checklist','Audit Dashboard'];
@@ -335,33 +437,26 @@ function setStep(n){
   document.getElementById('topBarTitle').textContent=titles[n];
   document.getElementById('topBarSub').textContent=subs[n];
   document.getElementById('stepBadge').textContent=`Step ${n} / 3`;
-  document.getElementById('liveScoreBox').style.display= n===2?'block':'none';
+  document.getElementById('liveScoreBox').style.display=n===2?'block':'none';
   window.scrollTo(0,0);
 }
-
 function validateStep1(){
-  const b=document.getElementById('branchCode').value;
-  const i=document.getElementById('inspector').value.trim();
-  if(!b||!i){alert('กรุณาเลือกสาขาและกรอกชื่อผู้ตรวจก่อนครับ');return false;}
+  if(!document.getElementById('branchCode').value||!document.getElementById('inspector').value.trim()){
+    alert('กรุณาเลือกสาขาและกรอกชื่อผู้ตรวจก่อนครับ'); return false;
+  }
   return true;
 }
 function goToStep1(){setStep(1);}
-function goToStep2(){
-  if(!validateStep1()) return;
-  buildChecklist();
-  setStep(2);
-}
-function goToStep3(){buildDashboard();setStep(3);}
+function goToStep2(){if(!validateStep1()) return; buildChecklist(); setStep(2);}
+function goToStep3(){buildDashboard(); setStep(3);}
 
-// ─── CHECKLIST ───
+// ════════════ CHECKLIST ════════════
 function buildChecklist(){
-  const nav=document.getElementById('sectionNav');
-  nav.innerHTML=SECTIONS.map(s=>`
+  document.getElementById('sectionNav').innerHTML=SECTIONS.map(s=>`
     <button id="stab-${s.code}" onclick="switchSection('${s.code}')"
       class="sec-tab ${s.code===currentSec?'grad-btn text-white':'bg-surface-container-lowest text-on-surface-variant border border-outline-variant/30'} text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-sm flex items-center gap-1.5 transition-all">
       <span class="material-symbols-outlined text-base">${s.icon}</span>${s.code}
-    </button>
-  `).join('');
+    </button>`).join('');
   renderSection(currentSec);
 }
 
@@ -377,8 +472,7 @@ function switchSection(code){
       isActive?'grad-btn text-white':
       ans===items.length&&fail>0?'bg-red-50 text-red-700 border border-red-200':
       ans===items.length?'bg-green-50 text-green-700 border border-green-200':
-      'bg-surface-container-lowest text-on-surface-variant border border-outline-variant/30'
-    }`;
+      'bg-surface-container-lowest text-on-surface-variant border border-outline-variant/30'}`;
   });
   renderSection(code);
 }
@@ -404,15 +498,12 @@ function renderSection(code){
           <p class="text-xs text-outline uppercase tracking-widest">${pct}% pass</p>
         </div>
       </div>
-      <div class="p-6 space-y-3">
-        ${items.map(item=>renderItem(item)).join('')}
-      </div>
+      <div class="p-6 space-y-3">${items.map(item=>renderItem(item)).join('')}</div>
     </div>
     <div class="flex justify-end gap-3 mb-20">
       ${code!=='A'?`<button onclick="prevSection('${code}')" class="bg-surface-container-lowest border border-outline-variant/30 text-on-surface-variant text-sm font-bold uppercase tracking-widest px-5 py-2.5 rounded-sm flex items-center gap-2"><span class="material-symbols-outlined text-base">arrow_back</span>หมวดก่อน</button>`:''}
       ${code!=='K'?`<button onclick="nextSection('${code}')" class="grad-btn text-white text-sm font-bold uppercase tracking-widest px-5 py-2.5 rounded-sm flex items-center gap-2">หมวดถัดไป<span class="material-symbols-outlined text-base">arrow_forward</span></button>`:''}
-    </div>
-  `;
+    </div>`;
 }
 
 function renderItem(item){
@@ -433,18 +524,20 @@ function renderItem(item){
         </button>
       </div>
     </div>
-    ${ans==='fail'?`
+    <!-- Photo + remark: always visible after answer -->
+    ${ans?`
     <div class="mt-3 ml-9 space-y-2">
-      <input value="${rem}" oninput="setRemark(${item.no},this.value)" placeholder="📝 ระบุปัญหาที่พบ..." class="w-full bg-white border border-red-200 focus:border-red-400 rounded-sm py-2 px-3 text-sm text-red-900 outline-none font-['Manrope']"/>
-      <div class="flex items-center gap-3">
-        <label class="flex items-center gap-2 cursor-pointer bg-white border border-orange-200 hover:border-primary px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider text-primary transition-all">
+      ${ans==='fail'?`<input value="${rem}" oninput="setRemark(${item.no},this.value)" placeholder="📝 ระบุปัญหาที่พบ..." class="w-full bg-white border border-red-200 focus:border-red-400 rounded-sm py-2 px-3 text-sm text-red-900 outline-none font-['Manrope']"/>`:''}
+      <!-- Photo upload (all items) -->
+      <div class="flex items-center gap-3 flex-wrap">
+        <label class="flex items-center gap-2 cursor-pointer bg-white border ${ans==='fail'?'border-orange-300 hover:border-orange-500 text-orange-700':'border-outline-variant/40 hover:border-outline text-outline'} px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider transition-all">
           <span class="material-symbols-outlined text-base">add_a_photo</span> แนบรูป
           <input type="file" accept="image/*" multiple style="display:none" onchange="addPhotos(${item.no},this)"/>
         </label>
         ${ph.length>0?`<span class="text-xs text-outline">${ph.length} รูป</span>`:''}
       </div>
-      ${ph.length>0?`<div class="flex flex-wrap gap-2 mt-1">${ph.map((p,i)=>`
-        <div class="relative w-16 h-16 rounded-sm overflow-hidden border border-red-200 cursor-pointer group" onclick="openLightbox('${p}','รายการ ${item.no}')">
+      ${ph.length>0?`<div class="flex flex-wrap gap-2">${ph.map((p,i)=>`
+        <div class="relative w-16 h-16 rounded-sm overflow-hidden border ${ans==='fail'?'border-red-200':'border-outline-variant/30'} cursor-pointer group" onclick="openLightbox('${p}','รายการ ${item.no}')">
           <img src="${p}" class="w-full h-full object-cover"/>
           <button onclick="event.stopPropagation();removePhoto(${item.no},${i})" class="absolute top-0.5 right-0.5 bg-red-600 text-white rounded-full w-4 h-4 text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
         </div>`).join('')}</div>`:''}
@@ -454,7 +547,7 @@ function renderItem(item){
 
 function setAnswer(no,val){
   answers[no]=val;
-  if(val==='pass'){delete remarks[no];delete photos[no];}
+  if(val==='pass'){delete remarks[no];}
   updateProgress();
   const item=ITEMS.find(i=>i.no===no);
   const el=document.getElementById('item-'+no);
@@ -466,11 +559,11 @@ function addPhotos(no,input){
   if(!photos[no]) photos[no]=[];
   Array.from(input.files).forEach(f=>{
     const reader=new FileReader();
-    reader.onload=e=>{photos[no].push(e.target.result);renderSection(currentSec);};
+    reader.onload=e=>{photos[no].push(e.target.result); renderSection(currentSec);};
     reader.readAsDataURL(f);
   });
 }
-function removePhoto(no,idx){photos[no].splice(idx,1);renderSection(currentSec);}
+function removePhoto(no,idx){photos[no].splice(idx,1); renderSection(currentSec);}
 function openLightbox(src,cap){
   document.getElementById('lbImg').src=src;
   document.getElementById('lbCaption').textContent=cap;
@@ -489,10 +582,10 @@ function updateProgress(){
   document.getElementById('btnFinish').disabled=answered<total;
   const score=calcScore();
   document.getElementById('scoreLive').textContent=score.net.toFixed(1)+'%';
-  document.getElementById('scoreLiveBar').style.width=score.net+'%';
+  document.getElementById('scoreLiveBar').style.width=Math.min(score.net,100)+'%';
 }
 
-// ─── CALCULATE ───
+// ════════════ SCORE ════════════
 function calcScore(){
   let totalDeduct=0;
   const secResults=SECTIONS.map(s=>{
@@ -501,13 +594,11 @@ function calcScore(){
     const total=items.length;
     const pct=total>0?(total-deduct)/total*100:100;
     const deductPts=s.weight*(deduct/total);
-    const earned=s.weight-deductPts;
     totalDeduct+=deductPts;
-    return{...s,total,deduct,pct,earned};
+    return{...s,total,deduct,pct,earned:s.weight-deductPts};
   });
   return{secResults,net:100-totalDeduct,totalDeduct};
 }
-
 function getGrade(p){
   if(p>=90) return{label:'⭐ ดีมาก',sub:'Excellence',cls:'text-green-700 bg-green-50'};
   if(p>=85) return{label:'✅ มาตรฐาน',sub:'Standard',cls:'text-blue-700 bg-blue-50'};
@@ -516,9 +607,9 @@ function getGrade(p){
 }
 function barColor(p){return p>=90?'#16a34a':p>=85?'#2563eb':p>=70?'#d97706':'#dc2626';}
 
-// ─── DASHBOARD ───
+// ════════════ DASHBOARD ════════════
 function buildDashboard(){
-  const {secResults,net}=calcScore();
+  const{secResults,net}=calcScore();
   const grade=getGrade(net);
   const branch=document.getElementById('branchCode');
   const branchName=branch.options[branch.selectedIndex].text;
@@ -527,25 +618,25 @@ function buildDashboard(){
   const manager=document.getElementById('manager').value;
   const totalFail=ITEMS.filter(i=>answers[i.no]==='fail').length;
   const totalPass=ITEMS.length-totalFail;
+  const totalPhotos=Object.values(photos).reduce((a,b)=>a+b.length,0);
 
   document.getElementById('heroCard').innerHTML=`
-    <div class="w-28 h-28 rounded-full border-4 border-orange-400 flex flex-col items-center justify-center flex-shrink-0" style="border-color:#FF6B00">
-      <span class="text-3xl font-black text-orange-400 font-['Noto_Serif']" style="color:#FF6B00">${net.toFixed(1)}</span>
-      <span class="text-xs text-white/60 font-['Manrope']">%</span>
+    <div class="w-28 h-28 rounded-full border-4 flex flex-col items-center justify-center flex-shrink-0" style="border-color:#FF6B00">
+      <span class="text-3xl font-black font-['Noto_Serif']" style="color:#FF6B00">${net.toFixed(1)}</span>
+      <span class="text-xs text-white/60">%</span>
     </div>
     <div class="flex-1">
-      <p class="text-orange-400 text-[10px] uppercase tracking-widest font-bold mb-1" style="color:#FF6B00">${branchName}</p>
-      <h1 class="text-2xl font-black text-white font-['Noto_Serif'] mb-3">Audit Result</h1>
-      <p class="text-white/60 text-xs leading-relaxed font-['Manrope']">📅 ${date} &nbsp;·&nbsp; 👤 ${inspector} &nbsp;·&nbsp; 🏪 ${manager||'—'}</p>
+      <p class="text-[10px] uppercase tracking-widest font-bold mb-1" style="color:#FF6B00">${branchName}</p>
+      <h1 class="text-2xl font-black text-white font-['Noto_Serif'] mb-2">Audit Result</h1>
+      <p class="text-white/60 text-xs leading-relaxed">📅 ${date} &nbsp;·&nbsp; 👤 ${inspector} &nbsp;·&nbsp; 🏪 ${manager||'—'} &nbsp;·&nbsp; 🔑 EMP ${currentUser}</p>
       <span class="inline-block mt-3 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-sm ${grade.cls}">${grade.label} — ${grade.sub}</span>
-    </div>
-  `;
+    </div>`;
 
   document.getElementById('kpiGrid').innerHTML=[
     {val:167,lbl:'Total Items',icon:'assignment',c:'border-orange-400'},
     {val:totalPass,lbl:'Passed',icon:'check_circle',c:'border-green-500'},
     {val:totalFail,lbl:'Failed',icon:'cancel',c:'border-red-500'},
-    {val:net.toFixed(2)+'%',lbl:'Net Score',icon:'leaderboard',c:'border-blue-500'},
+    {val:totalPhotos,lbl:'Photos',icon:'photo_library',c:'border-blue-500'},
   ].map(k=>`
     <div class="bg-surface-container-lowest rounded-lg p-5 border-l-4 ${k.c}" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.08)">
       <div class="flex justify-between items-start mb-3">
@@ -553,26 +644,17 @@ function buildDashboard(){
         <span class="material-symbols-outlined text-outline text-lg">${k.icon}</span>
       </div>
       <p class="text-3xl font-black text-on-surface font-['Noto_Serif']">${k.val}</p>
-    </div>
-  `).join('');
+    </div>`).join('');
 
-  // Chart
   if(chartInstance) chartInstance.destroy();
   chartInstance=new Chart(document.getElementById('resultChart'),{
     type:'bar',
-    data:{
-      labels:secResults.map(s=>s.code),
-      datasets:[{data:secResults.map(s=>s.pct),backgroundColor:secResults.map(s=>barColor(s.pct)),borderRadius:2}]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
+    data:{labels:secResults.map(s=>s.code),datasets:[{data:secResults.map(s=>s.pct),backgroundColor:secResults.map(s=>barColor(s.pct)),borderRadius:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
       scales:{y:{min:60,max:100,ticks:{callback:v=>v+'%',font:{family:'Manrope',size:10}},grid:{color:'rgba(142,113,100,0.1)'}},
-        x:{ticks:{font:{family:'Manrope',size:10,weight:'700'}},grid:{display:false}}}
-    }
+        x:{ticks:{font:{family:'Manrope',size:10,weight:'700'}},grid:{display:false}}}}
   });
 
-  // Score breakdown
   document.getElementById('resultTable').innerHTML=secResults.map(s=>`
     <div class="flex items-center gap-3 py-2">
       <span class="w-7 h-7 rounded-sm flex items-center justify-center text-white text-xs font-black flex-shrink-0" style="background:linear-gradient(135deg,#FF6B00,#0052FF)">${s.code}</span>
@@ -582,14 +664,12 @@ function buildDashboard(){
           <span class="text-xs font-black ml-2" style="color:${barColor(s.pct)}">${s.pct.toFixed(1)}%</span>
         </div>
         <div class="h-1 bg-surface-container-high rounded-full overflow-hidden">
-          <div class="h-1 rounded-full transition-all" style="width:${s.pct}%;background:${barColor(s.pct)}"></div>
+          <div class="h-1 rounded-full" style="width:${s.pct}%;background:${barColor(s.pct)}"></div>
         </div>
       </div>
       ${s.deduct>0?`<span class="text-[10px] font-bold text-red-600 flex-shrink-0">-${s.deduct}</span>`:'<span class="material-symbols-outlined text-green-600 text-base flex-shrink-0">check</span>'}
-    </div>
-  `).join('');
+    </div>`).join('');
 
-  // Fail list
   const failItems=ITEMS.filter(i=>answers[i.no]==='fail');
   document.getElementById('failCard').style.display=failItems.length?'block':'none';
   document.getElementById('failList').innerHTML=failItems.length===0
@@ -600,8 +680,7 @@ function buildDashboard(){
       <p class="text-sm font-semibold text-on-surface">${item.text}</p>
       ${remarks[item.no]?`<p class="text-xs text-outline mt-1">📝 ${remarks[item.no]}</p>`:''}
       ${photos[item.no]&&photos[item.no].length?`<div class="flex gap-2 mt-2">${photos[item.no].map(p=>`<div class="w-14 h-14 rounded-sm overflow-hidden border border-red-200 cursor-pointer" onclick="openLightbox('${p}','รายการ ${item.no}')"><img src="${p}" class="w-full h-full object-cover"/></div>`).join('')}</div>`:''}
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function resetAll(){
@@ -611,9 +690,6 @@ function resetAll(){
   document.getElementById('auditDate').value=new Date().toISOString().split('T')[0];
   setStep(1);
 }
-
-// Init
-setStep(1);
 </script>
 </body>
 </html>
