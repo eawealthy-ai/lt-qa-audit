@@ -2,121 +2,132 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>LT QA Audit — Branch Inspection</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#FF6B00"/>
+<title>LT QA Audit</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@700;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-tailwind.config = {
-  darkMode:"class",
-  theme:{extend:{colors:{
-    "inverse-surface":"#3d2d26","surface-dim":"#efd5ca","on-primary":"#ffffff","error":"#ba1a1a",
-    "on-surface":"#261812","primary":"#a04100","surface-container-highest":"#f8ddd2","background":"#fff8f6",
-    "surface-container-lowest":"#ffffff","on-primary-fixed":"#351000","primary-fixed":"#ffdbcc",
-    "error-container":"#ffdad6","secondary":"#003ec6","surface-container":"#ffeae1",
-    "primary-fixed-dim":"#ffb693","on-surface-variant":"#5a4136","secondary-container":"#0052fe",
-    "outline":"#8e7164","surface":"#fff8f6","outline-variant":"#e2bfb0",
-    "surface-container-low":"#fff1eb","surface-container-high":"#fee3d8",
-    "on-background":"#261812","primary-container":"#ff6b00",
-  },borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},
-  fontFamily:{"headline":["Noto Serif"],"body":["Manrope"],"label":["Manrope"]}}}
-}
+<script>
+tailwind.config={darkMode:"class",theme:{extend:{colors:{
+  "inverse-surface":"#3d2d26","surface-dim":"#efd5ca","on-primary":"#ffffff","error":"#ba1a1a",
+  "on-surface":"#261812","primary":"#a04100","background":"#fff8f6",
+  "surface-container-lowest":"#ffffff","on-primary-fixed":"#351000","primary-fixed":"#ffdbcc",
+  "error-container":"#ffdad6","secondary":"#003ec6","surface-container":"#ffeae1",
+  "on-surface-variant":"#5a4136","secondary-container":"#0052fe",
+  "outline":"#8e7164","surface":"#fff8f6","outline-variant":"#e2bfb0",
+  "surface-container-low":"#fff1eb","surface-container-high":"#fee3d8",
+  "on-background":"#261812","primary-container":"#ff6b00",
+},borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},
+fontFamily:{"headline":["Noto Serif"],"body":["Manrope"],"label":["Manrope"]}}}}
 </script>
 <style>
+  *{-webkit-tap-highlight-color:transparent}
   .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
   .filled{font-variation-settings:'FILL' 1}
-  body{font-family:'Manrope',sans-serif}
+  body{font-family:'Manrope',sans-serif;-webkit-font-smoothing:antialiased}
   h1,h2,h3,.serif{font-family:'Noto Serif',serif}
-  .grad-btn{background:linear-gradient(90deg,#FF6B00,#0052FF)}
-  .grad-btn:hover{opacity:.9}
+  .grad{background:linear-gradient(90deg,#FF6B00,#0052FF)}
+  .grad-v{background:linear-gradient(160deg,#FF6B00 0%,#0052FF 100%)}
+  .grad-btn{background:linear-gradient(90deg,#FF6B00,#0052FF);transition:opacity .2s}
+  .grad-btn:active{opacity:.85}
   .sidebar-grad{background:linear-gradient(180deg,#FF6B00 0%,#0052FF 100%)}
-  .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;align-items:center;justify-content:center}
+  .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;align-items:center;justify-content:center}
   .lightbox.open{display:flex}
-  input[type=password]::-ms-reveal{display:none}
+  /* iOS safe areas */
+  .safe-top{padding-top:env(safe-area-inset-top)}
+  .safe-bottom{padding-bottom:env(safe-area-inset-bottom)}
+  .pb-safe{padding-bottom:calc(env(safe-area-inset-bottom) + 80px)}
+  /* Smooth scroll */
+  html{scroll-behavior:smooth}
+  /* Mobile drawer */
+  #drawer{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+  #drawer.open{transform:translateX(0)}
+  #drawerOverlay{display:none;opacity:0;transition:opacity .3s}
+  #drawerOverlay.open{display:block;opacity:1}
+  /* Active states for touch */
+  button:active,label:active{transform:scale(.97)}
 </style>
 </head>
 <body class="bg-surface text-on-surface min-h-screen">
 
-<!-- ══════════════════════════════════════
-     LOGIN SCREEN
-══════════════════════════════════════ -->
-<div id="loginScreen" class="fixed inset-0 z-[200] flex">
-  <!-- Left gradient panel -->
-  <div class="hidden lg:flex w-1/2 flex-col justify-between p-14" style="background:linear-gradient(160deg,#FF6B00 0%,#0052FF 100%)">
+<!-- ══════════ LOGIN ══════════ -->
+<div id="loginScreen" class="fixed inset-0 z-[300] flex">
+  <!-- Desktop: left gradient panel -->
+  <div class="hidden lg:flex w-5/12 flex-col justify-between p-14 grad-v">
     <div>
-      <h1 class="font-['Noto_Serif'] text-4xl font-black text-white leading-tight mb-3">LT QA Audit</h1>
-      <p class="text-white/70 text-sm tracking-widest uppercase font-['Manrope']">Branch Inspection System</p>
+      <h1 class="font-['Noto_Serif'] text-4xl font-black text-white leading-tight mb-2">LT QA Audit</h1>
+      <p class="text-white/60 text-xs tracking-widest uppercase">Branch Inspection System</p>
     </div>
-    <div class="space-y-6">
-      <div class="bg-white/10 backdrop-blur rounded-sm p-5">
-        <p class="text-[10px] uppercase tracking-widest text-white/60 font-bold mb-3">ระบบนี้ครอบคลุม</p>
-        <div class="space-y-2">
-          <div class="flex items-center gap-3 text-white text-sm"><span class="material-symbols-outlined text-base filled">check_circle</span>Checklist 167 รายการ · 11 หมวด</div>
-          <div class="flex items-center gap-3 text-white text-sm"><span class="material-symbols-outlined text-base filled">check_circle</span>บันทึกรูปภาพหลักฐาน</div>
-          <div class="flex items-center gap-3 text-white text-sm"><span class="material-symbols-outlined text-base filled">check_circle</span>Dashboard สรุปผลอัตโนมัติ</div>
-          <div class="flex items-center gap-3 text-white text-sm"><span class="material-symbols-outlined text-base filled">check_circle</span>พิมพ์รายงานได้ทันที</div>
-        </div>
+    <div class="space-y-4">
+      <div class="bg-white/10 backdrop-blur rounded-sm p-5 space-y-2">
+        <p class="text-[10px] uppercase tracking-widest text-white/50 font-bold mb-3">ระบบนี้ครอบคลุม</p>
+        <div class="flex items-center gap-3 text-white text-sm"><span class="material-symbols-outlined text-base filled">check_circle</span>Checklist 167 รายการ · 11 หมวด</div>
+        <div class="flex items-center gap-3 text-white text-sm"><span class="material-symbols-outlined text-base filled">check_circle</span>บันทึกรูปภาพหลักฐาน</div>
+        <div class="flex items-center gap-3 text-white text-sm"><span class="material-symbols-outlined text-base filled">check_circle</span>Dashboard สรุปผลอัตโนมัติ</div>
       </div>
-      <p class="text-white/40 text-xs font-['Manrope']">FAB Holdings · QA Division · 2026</p>
+      <p class="text-white/30 text-xs">FAB Holdings · QA Division · 2026</p>
     </div>
   </div>
-  <!-- Right login form -->
-  <div class="flex-1 bg-surface flex items-center justify-center p-8">
+  <!-- Right: login form -->
+  <div class="flex-1 flex items-center justify-center p-6 bg-surface overflow-y-auto">
     <div class="w-full max-w-sm">
-      <!-- Logo (mobile) -->
-      <div class="lg:hidden mb-8 text-center">
-        <h1 class="font-['Noto_Serif'] text-3xl font-black text-primary">LT QA Audit</h1>
+      <!-- Mobile logo -->
+      <div class="lg:hidden text-center mb-8">
+        <div class="w-16 h-16 rounded-xl mx-auto mb-4 flex items-center justify-center grad-v shadow-lg">
+          <span class="material-symbols-outlined filled text-white text-3xl">fact_check</span>
+        </div>
+        <h1 class="font-['Noto_Serif'] text-2xl font-black text-primary">LT QA Audit</h1>
         <p class="text-outline text-xs tracking-widest uppercase mt-1">Branch Inspection System</p>
       </div>
-      <div class="bg-surface-container-lowest rounded-lg p-8" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.12)">
-        <div class="flex items-center gap-3 mb-8">
-          <div class="w-10 h-10 rounded-sm flex items-center justify-center" style="background:linear-gradient(135deg,#FF6B00,#0052FF)">
-            <span class="material-symbols-outlined filled text-white text-xl">lock</span>
+      <div class="bg-surface-container-lowest rounded-xl p-7 shadow-xl">
+        <div class="flex items-center gap-3 mb-7">
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center grad-v flex-shrink-0">
+            <span class="material-symbols-outlined filled text-white text-lg">lock</span>
           </div>
           <div>
-            <h2 class="font-black text-base serif text-on-surface">เข้าสู่ระบบ</h2>
+            <h2 class="font-black text-base serif">เข้าสู่ระบบ</h2>
             <p class="text-[10px] text-outline uppercase tracking-wider">QA Inspector Login</p>
           </div>
         </div>
         <div class="space-y-4">
           <div>
-            <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">รหัสพนักงาน (Employee No.)</label>
+            <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">รหัสพนักงาน</label>
             <div class="relative">
-              <span class="material-symbols-outlined absolute left-3 top-3 text-outline text-lg">badge</span>
-              <input type="text" id="loginUser" placeholder="เช่น 123456" maxlength="20"
-                class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-sm py-3 pl-10 pr-4 text-sm outline-none transition-colors font-['Manrope']"
-                onkeydown="if(event.key==='Enter') doLogin()"/>
+              <span class="material-symbols-outlined absolute left-3 top-3.5 text-outline text-lg">badge</span>
+              <input type="text" id="loginUser" placeholder="เช่น 123456" inputmode="numeric" autocomplete="username"
+                class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-lg py-3.5 pl-10 pr-4 text-sm outline-none transition-colors"
+                onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()"/>
             </div>
           </div>
           <div>
-            <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">รหัสผ่าน (Password)</label>
+            <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">รหัสผ่าน</label>
             <div class="relative">
-              <span class="material-symbols-outlined absolute left-3 top-3 text-outline text-lg">key</span>
-              <input type="password" id="loginPass" placeholder="••••••"
-                class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-sm py-3 pl-10 pr-10 text-sm outline-none transition-colors font-['Manrope']"
-                onkeydown="if(event.key==='Enter') doLogin()"/>
-              <button type="button" onclick="togglePass()" class="absolute right-3 top-3">
+              <span class="material-symbols-outlined absolute left-3 top-3.5 text-outline text-lg">key</span>
+              <input type="password" id="loginPass" placeholder="••••" autocomplete="current-password"
+                class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-lg py-3.5 pl-10 pr-10 text-sm outline-none transition-colors"
+                onkeydown="if(event.key==='Enter')doLogin()"/>
+              <button type="button" onclick="togglePass()" class="absolute right-3 top-3.5 p-0.5">
                 <span class="material-symbols-outlined text-outline text-lg" id="passEye">visibility</span>
               </button>
             </div>
           </div>
-          <!-- Error -->
-          <div id="loginErr" class="hidden bg-error-container text-error text-xs font-bold rounded-sm px-4 py-3 flex items-center gap-2">
+          <div id="loginErr" class="hidden bg-error-container text-error text-xs font-bold rounded-lg px-4 py-3 flex items-center gap-2">
             <span class="material-symbols-outlined text-base">error</span>
             <span id="loginErrMsg">รหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง</span>
           </div>
-          <button onclick="doLogin()" class="grad-btn w-full text-white font-bold text-sm uppercase tracking-widest py-3.5 rounded-sm flex items-center justify-center gap-2 transition-all mt-2">
-            <span class="material-symbols-outlined text-xl">login</span> เข้าสู่ระบบ
+          <button onclick="doLogin()" class="grad-btn w-full text-white font-bold text-sm uppercase tracking-widest py-4 rounded-lg flex items-center justify-center gap-2 mt-1">
+            <span class="material-symbols-outlined">login</span> เข้าสู่ระบบ
           </button>
         </div>
-        <!-- Demo hint -->
-        <div class="mt-6 bg-primary-fixed rounded-sm p-4">
+        <div class="mt-5 bg-primary-fixed rounded-lg p-4">
           <p class="text-[10px] uppercase tracking-widest font-bold text-on-primary-fixed mb-2">Demo Account</p>
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div><span class="text-outline">รหัสพนักงาน</span><br><span class="font-black text-on-surface">123456</span></div>
-            <div><span class="text-outline">รหัสผ่าน</span><br><span class="font-black text-on-surface">1234</span></div>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div><span class="text-outline text-[10px] uppercase tracking-wide block">รหัสพนักงาน</span><span class="font-black text-on-surface text-base">123456</span></div>
+            <div><span class="text-outline text-[10px] uppercase tracking-wide block">รหัสผ่าน</span><span class="font-black text-on-surface text-base">1234</span></div>
           </div>
         </div>
       </div>
@@ -124,261 +135,304 @@ tailwind.config = {
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     MAIN APP (hidden until login)
-══════════════════════════════════════ -->
+<!-- ══════════ MAIN APP ══════════ -->
 <div id="mainApp" class="hidden">
 
-<!-- SIDEBAR -->
-<aside class="sidebar-grad h-screen w-64 fixed left-0 top-0 flex flex-col py-8 shadow-2xl z-50">
-  <div class="px-7 mb-8">
-    <h1 class="font-['Noto_Serif'] text-xl font-black text-white leading-tight">LT QA Audit</h1>
-    <p class="font-['Manrope'] text-[10px] tracking-widest font-medium uppercase text-white/60 mt-1">Branch Inspection System</p>
-  </div>
-  <!-- User badge -->
-  <div class="mx-3 mb-6 bg-white/15 rounded-sm px-4 py-3 flex items-center gap-3">
-    <div class="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center flex-shrink-0">
-      <span class="material-symbols-outlined filled text-white text-base">account_circle</span>
-    </div>
-    <div class="min-w-0">
-      <p class="text-white text-xs font-bold truncate" id="sidebarUser">—</p>
-      <p class="text-white/50 text-[10px] uppercase tracking-widest">QA Inspector</p>
-    </div>
-  </div>
-  <nav class="flex-1 space-y-0.5 px-3">
-    <button onclick="setStep(1)" id="snav-1" class="w-full text-left bg-white/20 border-l-4 border-white text-white font-bold py-3.5 px-5 flex items-center gap-3 transition-all rounded-sm">
-      <span class="material-symbols-outlined filled text-xl">assignment_ind</span>
-      <span class="font-['Manrope'] text-xs tracking-widest font-bold uppercase">Branch Info</span>
-    </button>
-    <button onclick="setStep(2)" id="snav-2" class="w-full text-left text-white/60 py-3.5 px-5 flex items-center gap-3 transition-all hover:bg-white/10 rounded-sm">
-      <span class="material-symbols-outlined text-xl">fact_check</span>
-      <span class="font-['Manrope'] text-xs tracking-widest font-medium uppercase">Checklist</span>
-    </button>
-    <button onclick="setStep(3)" id="snav-3" class="w-full text-left text-white/60 py-3.5 px-5 flex items-center gap-3 transition-all hover:bg-white/10 rounded-sm">
-      <span class="material-symbols-outlined text-xl">leaderboard</span>
-      <span class="font-['Manrope'] text-xs tracking-widest font-medium uppercase">Dashboard</span>
-    </button>
-  </nav>
-  <!-- Live Score -->
-  <div class="mx-3 mb-4 bg-white/10 backdrop-blur rounded-sm p-4" id="liveScoreBox" style="display:none">
-    <p class="text-[10px] uppercase tracking-widest text-white/60 font-bold mb-1">Live Score</p>
-    <p class="text-3xl font-black text-white font-['Noto_Serif']" id="scoreLive">—</p>
-    <div class="h-1 bg-white/20 rounded-full mt-2"><div class="h-1 bg-white rounded-full transition-all" id="scoreLiveBar" style="width:0%"></div></div>
-  </div>
-  <div class="px-3 pt-4 border-t border-white/10">
-    <button onclick="doLogout()" class="w-full flex items-center gap-3 text-white/60 hover:text-white hover:bg-white/10 px-4 py-3 rounded-sm transition-all text-xs uppercase tracking-widest font-bold">
-      <span class="material-symbols-outlined text-base">logout</span> ออกจากระบบ
-    </button>
-  </div>
-</aside>
+  <!-- Mobile drawer overlay -->
+  <div id="drawerOverlay" class="fixed inset-0 bg-black/50 z-[90] lg:hidden" onclick="closeDrawer()"></div>
 
-<!-- TOP BAR -->
-<header class="flex justify-between items-center px-10 h-16 fixed top-0 right-0 left-64 bg-white/80 backdrop-blur-[40px] z-40 shadow-sm">
-  <div>
-    <h2 class="font-['Noto_Serif'] text-lg font-black text-primary" id="topBarTitle">Branch Information</h2>
-    <p class="font-['Manrope'] text-xs text-outline" id="topBarSub">กรอกข้อมูลสาขาก่อนเริ่มตรวจ</p>
-  </div>
-  <div class="flex items-center gap-3">
-    <span class="bg-primary-fixed text-on-primary-fixed text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-sm" id="stepBadge">Step 1 / 3</span>
-    <button onclick="window.print()" class="w-9 h-9 flex items-center justify-center hover:bg-surface-container-low rounded-sm transition-colors">
-      <span class="material-symbols-outlined text-outline text-xl">print</span>
-    </button>
-  </div>
-</header>
-
-<!-- MAIN CANVAS -->
-<main class="ml-64 pt-24 pb-16 px-10 max-w-[1400px]">
-
-<!-- ══ STEP 1: BRANCH INFO ══ -->
-<div class="step-page" id="step1">
-  <div class="mb-8">
-    <h3 class="text-2xl font-black serif text-on-surface mb-1">Branch Inspection Setup</h3>
-    <p class="text-sm text-outline">กรอกข้อมูลสาขาและผู้ตรวจก่อนเริ่มกรอก checklist</p>
-  </div>
-  <div class="grid grid-cols-12 gap-6">
-    <div class="col-span-8 bg-surface-container-lowest rounded-lg p-8" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.08)">
-      <div class="flex items-center gap-3 mb-6 pb-6 border-b border-outline-variant/20">
-        <div class="w-10 h-10 flex items-center justify-center rounded-sm" style="background:linear-gradient(135deg,#FF6B00,#0052FF)">
-          <span class="material-symbols-outlined filled text-white text-xl">store</span>
-        </div>
-        <div><h3 class="font-black text-base serif">Branch Details</h3><p class="text-[10px] text-outline uppercase tracking-wider">ข้อมูลสาขา</p></div>
-      </div>
-      <div class="grid grid-cols-2 gap-5">
-        <div class="col-span-2">
-          <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">สาขา / Branch</label>
-          <select id="branchCode" class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-sm py-3 px-4 text-sm text-on-surface outline-none transition-colors font-['Manrope']">
-            <option value="">— เลือกสาขา —</option>
-            <option value="5001">5001 — Fashion Island</option><option value="5002">5002 — Seacon Srinakarin</option>
-            <option value="5003">5003 — The Mall Thapra</option><option value="5004">5004 — CT Rattanathibet</option>
-            <option value="5005">5005 — The Mall Bangkapi</option><option value="5007">5007 — CT Rama 2</option>
-            <option value="5010">5010 — Passion Rayong</option><option value="5011">5011 — The Mall Ngamwongwan</option>
-            <option value="5012">5012 — LT Bangplee</option><option value="5013">5013 — Laemthong Bangsaen</option>
-            <option value="5014">5014 — Big C Extra Middle Pattaya</option><option value="5015">5015 — Pacific Park Sriracha</option>
-            <option value="5016">5016 — Imperial World Samrong</option><option value="5017">5017 — Seacon Bangkae</option>
-            <option value="5018">5018 — CT Ramintra</option><option value="5019">5019 — Terminal 21 Asok</option>
-            <option value="5023">5023 — Big C Extra South Pattaya</option><option value="5024">5024 — The Mall Bangkae</option>
-            <option value="5025">5025 — Big C Extra Srinakarin</option><option value="5049">5049 — LT Chonburi</option>
-          </select>
-        </div>
+  <!-- SIDEBAR (desktop) + DRAWER (mobile) -->
+  <aside id="drawer" class="sidebar-grad fixed left-0 top-0 h-full w-72 flex flex-col z-[100] shadow-2xl lg:w-64 lg:transform-none">
+    <div class="px-7 pt-8 pb-6 safe-top">
+      <div class="flex items-center justify-between">
         <div>
-          <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">วันที่ตรวจ</label>
-          <input type="date" id="auditDate" class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-sm py-3 px-4 text-sm outline-none transition-colors font-['Manrope']"/>
+          <h1 class="font-['Noto_Serif'] text-xl font-black text-white">LT QA Audit</h1>
+          <p class="text-[10px] tracking-widest text-white/50 uppercase mt-0.5">Branch Inspection</p>
         </div>
-        <div>
-          <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">ผู้ตรวจ (QA Inspector)</label>
-          <input type="text" id="inspector" placeholder="ชื่อ-นามสกุล" class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-sm py-3 px-4 text-sm outline-none transition-colors font-['Manrope']"/>
-        </div>
-        <div>
-          <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">ผู้จัดการสาขา</label>
-          <input type="text" id="manager" placeholder="ชื่อ-นามสกุล" class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-sm py-3 px-4 text-sm outline-none transition-colors font-['Manrope']"/>
-        </div>
-        <div>
-          <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">พนักงานบริการ</label>
-          <input type="text" id="serviceStaff" placeholder="เช่น 1+1" class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-sm py-3 px-4 text-sm outline-none transition-colors font-['Manrope']"/>
-        </div>
-        <div>
-          <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">พนักงานครัว</label>
-          <input type="text" id="kitchenStaff" placeholder="เช่น 1+1" class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-sm py-3 px-4 text-sm outline-none transition-colors font-['Manrope']"/>
-        </div>
-      </div>
-      <div class="mt-8 flex justify-end">
-        <button onclick="goToStep2()" class="grad-btn text-white font-bold text-sm uppercase tracking-widest px-8 py-3 rounded-sm flex items-center gap-2 transition-all">
-          เริ่มตรวจ <span class="material-symbols-outlined text-xl">arrow_forward</span>
+        <button onclick="closeDrawer()" class="lg:hidden text-white/60 hover:text-white p-1">
+          <span class="material-symbols-outlined">close</span>
         </button>
       </div>
     </div>
-    <div class="col-span-4 space-y-4">
-      <div class="bg-surface-container-lowest rounded-lg p-6" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.08)">
-        <p class="text-[10px] uppercase tracking-widest font-bold text-outline mb-4">Sections Overview</p>
-        <div id="sections-overview"></div>
+    <!-- User badge -->
+    <div class="mx-4 mb-5 bg-white/15 rounded-lg px-4 py-3 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-full bg-white/25 flex items-center justify-center flex-shrink-0">
+        <span class="material-symbols-outlined filled text-white">account_circle</span>
       </div>
-      <div class="rounded-lg p-6" style="background:linear-gradient(135deg,#FF6B00,#0052FF)">
-        <p class="text-[10px] uppercase tracking-widest font-bold text-white/70 mb-3">Total Checklist Items</p>
-        <p class="text-4xl font-black text-white font-['Noto_Serif']">167</p>
-        <p class="text-white/70 text-xs mt-2">across 11 sections · weighted scoring</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ STEP 2: CHECKLIST ══ -->
-<div class="step-page hidden" id="step2">
-  <div class="flex gap-2 flex-wrap mb-6" id="sectionNav"></div>
-  <div id="sectionContent"></div>
-  <div class="fixed bottom-0 left-64 right-0 bg-white/90 backdrop-blur-[20px] border-t border-outline-variant/20 px-10 py-4 flex items-center justify-between z-40">
-    <div class="flex items-center gap-4">
-      <span class="material-symbols-outlined text-outline">check_circle</span>
       <div>
-        <p class="text-xs font-bold text-on-surface" id="progressText">0 / 167 รายการ</p>
-        <div class="w-48 h-1 bg-surface-container-high rounded-full mt-1"><div class="h-1 rounded-full grad-btn transition-all" id="progressFill" style="width:0%"></div></div>
+        <p class="text-white text-xs font-bold" id="sidebarUser">—</p>
+        <p class="text-white/40 text-[10px] uppercase tracking-widest">QA Inspector</p>
       </div>
     </div>
-    <div class="flex gap-3">
-      <button onclick="goToStep1()" class="bg-surface-container-low text-on-surface-variant text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-sm flex items-center gap-2">
-        <span class="material-symbols-outlined text-base">arrow_back</span> ย้อนกลับ
+    <nav class="flex-1 px-3 space-y-0.5">
+      <button onclick="navTo(1)" id="snav-1" class="w-full text-left py-3.5 px-5 flex items-center gap-3 rounded-sm transition-all bg-white/20 border-l-4 border-white text-white font-bold">
+        <span class="material-symbols-outlined filled">assignment_ind</span>
+        <span class="text-xs tracking-widest uppercase">Branch Info</span>
       </button>
-      <button onclick="goToStep3()" id="btnFinish" disabled class="grad-btn text-white text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-sm flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
-        ดูผลสรุป <span class="material-symbols-outlined text-base">arrow_forward</span>
+      <button onclick="navTo(2)" id="snav-2" class="w-full text-left py-3.5 px-5 flex items-center gap-3 rounded-sm transition-all text-white/60 hover:bg-white/10">
+        <span class="material-symbols-outlined">fact_check</span>
+        <span class="text-xs tracking-widest uppercase">Checklist</span>
+      </button>
+      <button onclick="navTo(3)" id="snav-3" class="w-full text-left py-3.5 px-5 flex items-center gap-3 rounded-sm transition-all text-white/60 hover:bg-white/10">
+        <span class="material-symbols-outlined">leaderboard</span>
+        <span class="text-xs tracking-widest uppercase">Dashboard</span>
+      </button>
+    </nav>
+    <!-- Live score (sidebar) -->
+    <div class="mx-4 mb-4 bg-white/10 rounded-lg p-4" id="liveScoreBox" style="display:none">
+      <p class="text-[10px] uppercase tracking-widest text-white/50 font-bold mb-1">Live Score</p>
+      <p class="text-3xl font-black text-white font-['Noto_Serif']" id="scoreLive">—</p>
+      <div class="h-1 bg-white/20 rounded-full mt-2">
+        <div class="h-1 bg-white rounded-full transition-all" id="scoreLiveBar" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="px-3 pb-6 safe-bottom border-t border-white/10 pt-3">
+      <button onclick="doLogout()" class="w-full flex items-center gap-3 text-white/50 hover:text-white hover:bg-white/10 px-4 py-3 rounded-sm transition-all text-xs uppercase tracking-widest font-bold">
+        <span class="material-symbols-outlined text-base">logout</span> ออกจากระบบ
       </button>
     </div>
-  </div>
-</div>
+  </aside>
 
-<!-- ══ STEP 3: DASHBOARD ══ -->
-<div class="step-page hidden" id="step3">
-  <div class="rounded-lg p-8 mb-6 flex items-center gap-8" id="heroCard" style="background:linear-gradient(135deg,#1a1a2e,#16213e);box-shadow:0 12px 32px -4px rgba(38,24,18,0.15)"></div>
-  <div class="grid grid-cols-4 gap-5 mb-6" id="kpiGrid"></div>
-  <div class="grid grid-cols-12 gap-6 mb-6">
-    <div class="col-span-7 bg-surface-container-lowest rounded-lg p-7" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.08)">
-      <h3 class="text-xl font-black serif mb-1">Section Scores</h3>
-      <p class="text-xs text-outline mb-6 uppercase tracking-widest">คะแนนแยกตามหมวด</p>
-      <div class="relative h-56"><canvas id="resultChart"></canvas></div>
+  <!-- TOP BAR -->
+  <header class="fixed top-0 right-0 left-0 lg:left-64 z-40 bg-white/85 backdrop-blur-[40px] border-b border-outline-variant/15 flex items-center gap-3 px-4 lg:px-10 h-14 safe-top">
+    <!-- Hamburger (mobile) -->
+    <button onclick="openDrawer()" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-low -ml-1">
+      <span class="material-symbols-outlined text-outline">menu</span>
+    </button>
+    <div class="flex-1 min-w-0">
+      <h2 class="font-['Noto_Serif'] text-base font-black text-primary truncate" id="topBarTitle">Branch Information</h2>
+      <p class="text-[10px] text-outline hidden sm:block" id="topBarSub">กรอกข้อมูลสาขาก่อนเริ่มตรวจ</p>
     </div>
-    <div class="col-span-5 bg-surface-container-lowest rounded-lg p-7" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.08)">
-      <h3 class="text-xl font-black serif mb-1">Score Breakdown</h3>
-      <p class="text-xs text-outline mb-5 uppercase tracking-widest">รายละเอียดคะแนน</p>
-      <div class="space-y-3" id="resultTable"></div>
-    </div>
-  </div>
-  <div class="bg-surface-container-lowest rounded-lg p-7 mb-6" id="failCard" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.08)">
-    <h3 class="text-xl font-black serif mb-1">Non-Conformance Report</h3>
-    <p class="text-xs text-outline mb-5 uppercase tracking-widest">รายการที่ไม่ผ่าน</p>
-    <div id="failList"></div>
-  </div>
-  <div class="bg-surface-container-lowest rounded-lg p-7 mb-6" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.08)">
-    <p class="text-[10px] uppercase tracking-widest font-bold text-outline mb-4">เกณฑ์การประเมิน</p>
-    <div class="flex gap-3 flex-wrap">
-      <span class="bg-green-50 text-green-800 text-[11px] font-bold uppercase tracking-wider px-4 py-1.5 rounded-sm">⭐ ดีมาก ≥ 90%</span>
-      <span class="bg-blue-50 text-blue-800 text-[11px] font-bold uppercase tracking-wider px-4 py-1.5 rounded-sm">✅ มาตรฐาน ≥ 85%</span>
-      <span class="bg-yellow-50 text-yellow-800 text-[11px] font-bold uppercase tracking-wider px-4 py-1.5 rounded-sm">⚠️ ปรับปรุง ≥ 70%</span>
-      <span class="bg-red-50 text-red-800 text-[11px] font-bold uppercase tracking-wider px-4 py-1.5 rounded-sm">🚨 แก้ไขเร่งด่วน &lt; 70%</span>
-    </div>
-  </div>
-  <div class="flex justify-end gap-3">
-    <button onclick="goToStep2()" class="bg-surface-container-low text-on-surface-variant text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-sm flex items-center gap-2"><span class="material-symbols-outlined text-base">edit</span> แก้ไข</button>
-    <button onclick="window.print()" class="bg-surface-container-low text-on-surface-variant text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-sm flex items-center gap-2"><span class="material-symbols-outlined text-base">print</span> พิมพ์</button>
-    <button onclick="resetAll()" class="grad-btn text-white text-sm font-bold uppercase tracking-widest px-6 py-2.5 rounded-sm flex items-center gap-2"><span class="material-symbols-outlined text-base">add</span> ตรวจสาขาใหม่</button>
-  </div>
-</div>
+    <span class="bg-primary-fixed text-on-primary-fixed text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-sm flex-shrink-0" id="stepBadge">1/3</span>
+    <button onclick="window.print()" class="hidden sm:flex w-9 h-9 items-center justify-center hover:bg-surface-container-low rounded-sm">
+      <span class="material-symbols-outlined text-outline text-xl">print</span>
+    </button>
+  </header>
 
-</main>
+  <!-- MAIN CANVAS -->
+  <main class="lg:ml-64 pt-14 pb-safe min-h-screen" id="mainCanvas">
+
+    <!-- ══ STEP 1: BRANCH INFO ══ -->
+    <div class="step-page p-4 lg:p-10" id="step1">
+      <div class="mb-6">
+        <h3 class="text-xl lg:text-2xl font-black serif mb-1">Branch Inspection Setup</h3>
+        <p class="text-sm text-outline">กรอกข้อมูลสาขาและผู้ตรวจก่อนเริ่ม</p>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Form -->
+        <div class="lg:col-span-8 bg-surface-container-lowest rounded-xl p-6 lg:p-8 shadow-md">
+          <div class="flex items-center gap-3 mb-6 pb-5 border-b border-outline-variant/15">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 grad-v">
+              <span class="material-symbols-outlined filled text-white text-xl">store</span>
+            </div>
+            <div>
+              <h3 class="font-black text-base serif">Branch Details</h3>
+              <p class="text-[10px] text-outline uppercase tracking-wider">ข้อมูลสาขา</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2">
+              <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">สาขา / Branch</label>
+              <select id="branchCode" class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-lg py-3.5 px-4 text-sm outline-none transition-colors">
+                <option value="">— เลือกสาขา —</option>
+                <option value="5001">5001 — Fashion Island</option><option value="5002">5002 — Seacon Srinakarin</option>
+                <option value="5003">5003 — The Mall Thapra</option><option value="5004">5004 — CT Rattanathibet</option>
+                <option value="5005">5005 — The Mall Bangkapi</option><option value="5007">5007 — CT Rama 2</option>
+                <option value="5010">5010 — Passion Rayong</option><option value="5011">5011 — The Mall Ngamwongwan</option>
+                <option value="5012">5012 — LT Bangplee</option><option value="5013">5013 — Laemthong Bangsaen</option>
+                <option value="5014">5014 — Big C Extra Middle Pattaya</option><option value="5015">5015 — Pacific Park Sriracha</option>
+                <option value="5016">5016 — Imperial World Samrong</option><option value="5017">5017 — Seacon Bangkae</option>
+                <option value="5018">5018 — CT Ramintra</option><option value="5019">5019 — Terminal 21 Asok</option>
+                <option value="5023">5023 — Big C Extra South Pattaya</option><option value="5024">5024 — The Mall Bangkae</option>
+                <option value="5025">5025 — Big C Extra Srinakarin</option><option value="5049">5049 — LT Chonburi</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">วันที่ตรวจ</label>
+              <input type="date" id="auditDate" class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-lg py-3.5 px-4 text-sm outline-none transition-colors"/>
+            </div>
+            <div>
+              <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">ผู้ตรวจ (QA Inspector)</label>
+              <input type="text" id="inspector" placeholder="ชื่อ-นามสกุล" class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-lg py-3.5 px-4 text-sm outline-none transition-colors"/>
+            </div>
+            <div>
+              <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">ผู้จัดการสาขา</label>
+              <input type="text" id="manager" placeholder="ชื่อ-นามสกุล" class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-lg py-3.5 px-4 text-sm outline-none transition-colors"/>
+            </div>
+            <div>
+              <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">พนักงานบริการ</label>
+              <input type="text" id="serviceStaff" placeholder="เช่น 1+1" class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-lg py-3.5 px-4 text-sm outline-none transition-colors"/>
+            </div>
+            <div>
+              <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">พนักงานครัว</label>
+              <input type="text" id="kitchenStaff" placeholder="เช่น 1+1" class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-lg py-3.5 px-4 text-sm outline-none transition-colors"/>
+            </div>
+          </div>
+          <button onclick="goToStep2()" class="grad-btn w-full mt-7 text-white font-bold text-sm uppercase tracking-widest py-4 rounded-lg flex items-center justify-center gap-2">
+            เริ่มตรวจ <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+        </div>
+        <!-- Info panel -->
+        <div class="lg:col-span-4 space-y-4">
+          <div class="bg-surface-container-lowest rounded-xl p-5 shadow-md">
+            <p class="text-[10px] uppercase tracking-widest font-bold text-outline mb-4">Sections</p>
+            <div id="sections-overview" class="space-y-0.5"></div>
+          </div>
+          <div class="rounded-xl p-6 grad-v">
+            <p class="text-[10px] uppercase tracking-widest font-bold text-white/60 mb-2">Total Items</p>
+            <p class="text-5xl font-black text-white font-['Noto_Serif']">167</p>
+            <p class="text-white/60 text-xs mt-2">11 sections · weighted scoring</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 2: CHECKLIST ══ -->
+    <div class="step-page hidden" id="step2">
+      <!-- Section tabs (scrollable on mobile) -->
+      <div class="sticky top-14 z-30 bg-surface/95 backdrop-blur border-b border-outline-variant/15 px-4 py-3">
+        <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" id="sectionNav" style="-webkit-overflow-scrolling:touch"></div>
+      </div>
+      <div class="p-4 lg:p-10" id="sectionContent"></div>
+      <!-- Mobile bottom bar -->
+      <div class="fixed bottom-0 left-0 right-0 lg:left-64 bg-white/95 backdrop-blur-[20px] border-t border-outline-variant/20 px-4 py-3 z-40 safe-bottom">
+        <div class="flex items-center gap-3">
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-bold" id="progressText">0 / 167</p>
+            <div class="h-1.5 bg-surface-container-high rounded-full mt-1">
+              <div class="h-1.5 rounded-full grad-btn transition-all" id="progressFill" style="width:0%"></div>
+            </div>
+          </div>
+          <button onclick="goToStep1()" class="bg-surface-container-low text-on-surface-variant text-xs font-bold uppercase tracking-widest px-4 py-3 rounded-lg flex items-center gap-1.5 flex-shrink-0">
+            <span class="material-symbols-outlined text-base">arrow_back</span>
+          </button>
+          <button onclick="goToStep3()" id="btnFinish" disabled class="grad-btn text-white text-xs font-bold uppercase tracking-widest px-5 py-3 rounded-lg flex items-center gap-1.5 flex-shrink-0 disabled:opacity-40">
+            ผลสรุป <span class="material-symbols-outlined text-base">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 3: DASHBOARD ══ -->
+    <div class="step-page hidden p-4 lg:p-10" id="step3">
+      <!-- Hero -->
+      <div class="rounded-xl p-6 lg:p-8 mb-5 flex items-center gap-5" id="heroCard" style="background:linear-gradient(135deg,#1a1a2e,#16213e);box-shadow:0 12px 32px -4px rgba(38,24,18,0.2)"></div>
+      <!-- KPI 2x2 on mobile, 4x1 on desktop -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5 mb-5" id="kpiGrid"></div>
+      <!-- Chart -->
+      <div class="bg-surface-container-lowest rounded-xl p-5 lg:p-7 mb-5 shadow-md">
+        <h3 class="text-lg font-black serif mb-1">Section Scores</h3>
+        <p class="text-[10px] text-outline mb-5 uppercase tracking-widest">คะแนนแยกตามหมวด</p>
+        <div class="relative h-48 lg:h-56"><canvas id="resultChart"></canvas></div>
+      </div>
+      <!-- Score breakdown -->
+      <div class="bg-surface-container-lowest rounded-xl p-5 lg:p-7 mb-5 shadow-md">
+        <h3 class="text-lg font-black serif mb-1">Score Breakdown</h3>
+        <p class="text-[10px] text-outline mb-5 uppercase tracking-widest">รายละเอียดคะแนน</p>
+        <div class="space-y-3" id="resultTable"></div>
+      </div>
+      <!-- Fail list -->
+      <div class="bg-surface-container-lowest rounded-xl p-5 lg:p-7 mb-5 shadow-md" id="failCard">
+        <h3 class="text-lg font-black serif mb-1">Non-Conformance Report</h3>
+        <p class="text-[10px] text-outline mb-5 uppercase tracking-widest">รายการที่ไม่ผ่าน</p>
+        <div id="failList"></div>
+      </div>
+      <!-- Grade legend -->
+      <div class="bg-surface-container-lowest rounded-xl p-5 shadow-md mb-5">
+        <p class="text-[10px] uppercase tracking-widest font-bold text-outline mb-3">เกณฑ์การประเมิน</p>
+        <div class="grid grid-cols-2 gap-2">
+          <span class="bg-green-50 text-green-800 text-[10px] font-bold uppercase tracking-wide px-3 py-2 rounded-lg">⭐ ดีมาก ≥ 90%</span>
+          <span class="bg-blue-50 text-blue-800 text-[10px] font-bold uppercase tracking-wide px-3 py-2 rounded-lg">✅ มาตรฐาน ≥ 85%</span>
+          <span class="bg-yellow-50 text-yellow-800 text-[10px] font-bold uppercase tracking-wide px-3 py-2 rounded-lg">⚠️ ปรับปรุง ≥ 70%</span>
+          <span class="bg-red-50 text-red-800 text-[10px] font-bold uppercase tracking-wide px-3 py-2 rounded-lg">🚨 เร่งด่วน &lt;70%</span>
+        </div>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button onclick="goToStep2()" class="flex-1 bg-surface-container-low text-on-surface-variant text-sm font-bold uppercase tracking-widest py-3.5 rounded-lg flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-base">edit</span> แก้ไข
+        </button>
+        <button onclick="window.print()" class="flex-1 bg-surface-container-low text-on-surface-variant text-sm font-bold uppercase tracking-widest py-3.5 rounded-lg flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-base">print</span> พิมพ์
+        </button>
+        <button onclick="resetAll()" class="flex-1 grad-btn text-white text-sm font-bold uppercase tracking-widest py-3.5 rounded-lg flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-base">add</span> ตรวจสาขาใหม่
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Mobile bottom nav -->
+  <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-30 safe-bottom" id="mobileNav" style="display:none">
+    <!-- shown via JS when needed -->
+  </nav>
+
 </div><!-- /mainApp -->
 
 <!-- Lightbox -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <span class="absolute top-4 right-6 text-white text-4xl cursor-pointer leading-none">&times;</span>
-  <img id="lbImg" src="" class="max-w-[90vw] max-h-[88vh] rounded-lg"/>
-  <p id="lbCaption" class="absolute bottom-4 left-0 right-0 text-center text-white/70 text-sm"></p>
+  <button class="absolute top-4 right-5 text-white text-4xl leading-none z-10">&times;</button>
+  <img id="lbImg" src="" class="max-w-[92vw] max-h-[85vh] rounded-xl object-contain"/>
+  <p id="lbCaption" class="absolute bottom-6 left-0 right-0 text-center text-white/60 text-sm px-4"></p>
 </div>
 
 <script>
-// ════════════ AUTH ════════════
-const USERS = {
-  '123456': '1234',
-};
-let currentUser = null;
+// ════ AUTH ════
+const USERS={'123456':'1234'};
+let currentUser=null;
 
 function doLogin(){
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value;
-  const err = document.getElementById('loginErr');
-  if(!u || !p){ showErr('กรุณากรอกรหัสพนักงานและรหัสผ่าน'); return; }
-  if(USERS[u] && USERS[u]===p){
-    currentUser = u;
-    err.classList.add('hidden');
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  if(!u||!p){showErr('กรุณากรอกรหัสพนักงานและรหัสผ่าน');return;}
+  if(USERS[u]&&USERS[u]===p){
+    currentUser=u;
+    document.getElementById('loginErr').classList.add('hidden');
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('mainApp').classList.remove('hidden');
-    document.getElementById('sidebarUser').textContent = 'EMP · ' + u;
-    document.getElementById('auditDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('sidebarUser').textContent='EMP · '+u;
+    document.getElementById('auditDate').value=new Date().toISOString().split('T')[0];
     initSectionsOverview();
+    setStep(1);
   } else {
     showErr('รหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง');
     document.getElementById('loginPass').value='';
   }
 }
-function showErr(msg){
-  const err = document.getElementById('loginErr');
-  document.getElementById('loginErrMsg').textContent = msg;
-  err.classList.remove('hidden');
+function showErr(m){
+  document.getElementById('loginErrMsg').textContent=m;
+  document.getElementById('loginErr').classList.remove('hidden');
 }
 function doLogout(){
-  if(!confirm('ต้องการออกจากระบบ?\nข้อมูลที่ยังไม่ได้บันทึกจะหายไป')) return;
-  currentUser = null;
-  resetAll();
+  if(!confirm('ต้องการออกจากระบบ?\nข้อมูลที่ยังไม่ได้บันทึกจะหายไป'))return;
+  currentUser=null; resetAll();
   document.getElementById('mainApp').classList.add('hidden');
   document.getElementById('loginScreen').classList.remove('hidden');
   document.getElementById('loginUser').value='';
   document.getElementById('loginPass').value='';
 }
 function togglePass(){
-  const inp = document.getElementById('loginPass');
-  const eye = document.getElementById('passEye');
-  if(inp.type==='password'){ inp.type='text'; eye.textContent='visibility_off'; }
-  else { inp.type='password'; eye.textContent='visibility'; }
+  const i=document.getElementById('loginPass');
+  const e=document.getElementById('passEye');
+  i.type=i.type==='password'?'text':'password';
+  e.textContent=i.type==='password'?'visibility':'visibility_off';
 }
 
-// ════════════ DATA ════════════
-const SECTIONS = [
+// ════ DRAWER ════
+function openDrawer(){
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+function navTo(n){closeDrawer();setStep(n);}
+
+// ════ DATA ════
+const SECTIONS=[
   {code:'A',name:'Facilities',nameTH:'สิ่งอำนวยความสะดวก',weight:9,icon:'apartment'},
   {code:'B',name:'Service Standard',nameTH:'มาตรฐานการบริการ',weight:11.3,icon:'support_agent'},
   {code:'C',name:'Raw & Prepared',nameTH:'วัตถุดิบ',weight:30,icon:'kitchen'},
@@ -391,7 +445,7 @@ const SECTIONS = [
   {code:'J',name:'Hygiene',nameTH:'สุขอนามัย',weight:4,icon:'sanitizer'},
   {code:'K',name:'Operations',nameTH:'การจัดการ',weight:3.2,icon:'settings'},
 ];
-const ITEMS = [
+const ITEMS=[
   {no:1,sec:'A',text:'ป้ายและการตกแต่งภายนอกร้าน'},{no:2,sec:'A',text:'ความสะอาดพื้น ผนัง เพดานภายในร้าน'},{no:3,sec:'A',text:'ที่ตั้งเมนู / ตะกร้าใส่ซอสบนโต๊ะลูกค้า'},{no:4,sec:'A',text:'โต๊ะและเก้าอี้ลูกค้า สภาพและความสะอาด'},{no:5,sec:'A',text:'แสงสว่างภายในร้าน'},{no:6,sec:'A',text:'เครื่องปรับอากาศ/พัดลม สภาพและความสะอาด'},{no:7,sec:'A',text:'ห้องน้ำ ความสะอาดและน้ำยาล้างมือ'},{no:8,sec:'A',text:'ถังขยะมีฝาปิด จัดวางเป็นระเบียบ'},{no:9,sec:'A',text:'Drink Station — ความสะอาดเคาน์เตอร์และอุปกรณ์'},{no:10,sec:'A',text:'Drink Station — ตู้เย็นและอุณหภูมิการเก็บรักษา'},{no:11,sec:'A',text:'Drink Station — วัตถุดิบมีการระบุวันหมดอายุ'},{no:12,sec:'A',text:'Serving Station — ตะกร้าและถาดเสิร์ฟ'},{no:13,sec:'A',text:'Serving Station — อุปกรณ์เสิร์ฟ (ที่คีบ, ช้อน)'},{no:14,sec:'A',text:'BOH — ความสะอาดพื้นที่ครัว'},{no:15,sec:'A',text:'BOH — โต๊ะเตรียมอาหาร สภาพและความสะอาด'},{no:16,sec:'A',text:'BOH — ตู้เย็น/ตู้แช่ สภาพภายนอก'},{no:17,sec:'A',text:'BOH — อุณหภูมิตู้แช่เย็น (0–4°C)'},{no:18,sec:'A',text:'BOH — อุณหภูมิตู้แช่แข็ง (≤ -18°C)'},{no:19,sec:'A',text:'BOH — การจัดเรียงวัตถุดิบ FIFO/FEFO'},{no:20,sec:'A',text:'ห้องสต็อก — ความเป็นระเบียบและความสะอาด'},{no:21,sec:'A',text:'ห้องสต็อก — สินค้าแห้งไม่สัมผัสพื้น (≥15 ซม.)'},{no:22,sec:'A',text:'ห้องสต็อก — ไม่มีสิ่งของไม่เกี่ยวข้อง'},{no:23,sec:'A',text:'การดูแลรักษาโดยรวม (Overall Maintenance)'},
   {no:24,sec:'B',text:'การแต่งกายพนักงานตามมาตรฐาน'},{no:25,sec:'B',text:'การทักทายลูกค้าเมื่อเข้าร้าน'},{no:26,sec:'B',text:'การนำเมนูและอธิบายรายการอาหาร'},{no:27,sec:'B',text:'ความรวดเร็วในการรับออเดอร์'},{no:28,sec:'B',text:'ความถูกต้องของออเดอร์ที่รับ'},{no:29,sec:'B',text:'เวลาเสิร์ฟตามมาตรฐาน'},{no:30,sec:'B',text:'การนำเสนออาหารตามมาตรฐาน'},{no:31,sec:'B',text:'การดูแลลูกค้าระหว่างรับประทานอาหาร'},{no:32,sec:'B',text:'การเก็บจาน/เติมน้ำ'},{no:33,sec:'B',text:'การเรียกเก็บเงินและกล่าวลาลูกค้า'},{no:34,sec:'B',text:'ความรู้เรื่องเมนู (Menu Knowledge)'},{no:35,sec:'B',text:'การจัดการข้อร้องเรียนลูกค้า'},{no:36,sec:'B',text:'ป้ายราคาและโปรโมชั่นถูกต้องเป็นปัจจุบัน'},{no:37,sec:'B',text:'ความสะอาดโต๊ะก่อนลูกค้านั่ง'},{no:38,sec:'B',text:'การจัดโต๊ะตามมาตรฐาน (Table Setting)'},
   {no:39,sec:'C',text:'วัตถุดิบสดมีวันหมดอายุและอยู่ในสภาพดี'},{no:40,sec:'C',text:'การละลายวัตถุดิบแช่แข็งถูกวิธี'},{no:41,sec:'C',text:'วัตถุดิบที่เตรียมแล้วมีฉลากและวัน DRE ชัดเจน'},{no:42,sec:'C',text:'การแยกเก็บวัตถุดิบดิบและสุก (Cross-contamination)'},{no:43,sec:'C',text:'วัตถุดิบในภาชนะปิดสนิทและสะอาด'},{no:44,sec:'C',text:'อุณหภูมิวัตถุดิบแช่เย็นอยู่ในเกณฑ์ (0–4°C)'},{no:45,sec:'C',text:'ไม่พบวัตถุดิบหมดอายุจากฉลากสินค้า'},{no:46,sec:'C',text:'ไม่พบวัตถุดิบหมดอายุจาก DRE การเตรียม'},{no:47,sec:'C',text:'ไม่พบวัตถุดิบหมดอายุจาก DRE ละลาย'},{no:48,sec:'C',text:'ไม่พบวัตถุดิบใช้วันต่อวันค้างข้ามวัน'},{no:49,sec:'C',text:'FEFO/FIFO ปฏิบัติถูกต้อง'},{no:50,sec:'C',text:'ปริมาณการเตรียมวัตถุดิบเหมาะสม'},{no:51,sec:'C',text:'วัตถุดิบประเภทเนื้อสัตว์ — สภาพและการเก็บรักษา'},{no:52,sec:'C',text:'วัตถุดิบประเภทปลาและอาหารทะเล'},{no:53,sec:'C',text:'วัตถุดิบประเภทกึ่งสำเร็จรูป / Frozen'},{no:54,sec:'C',text:'ซอสและน้ำจิ้ม — วันหมดอายุและการเก็บรักษา'},{no:55,sec:'C',text:'ของแห้ง — การจัดเก็บและวันหมดอายุ'},{no:56,sec:'C',text:'ผักและผลไม้ — สภาพและความสด'},{no:57,sec:'C',text:'ขนมปัง — สภาพและวันหมดอายุ'},{no:58,sec:'C',text:'Butter/Oil/Cheese — การเก็บรักษา'},{no:59,sec:'C',text:'อุณหภูมิภายในครัวเป็นไปตามมาตรฐาน'},{no:60,sec:'C',text:'การจัดเรียงสินค้าในตู้แช่ถูกหมวดหมู่'},{no:61,sec:'C',text:'ภาชนะใส่วัตถุดิบมีความสะอาด'},{no:62,sec:'C',text:'การบันทึกอุณหภูมิประจำวันครบถ้วน'},{no:63,sec:'C',text:'ไม่พบสินค้าที่หมดอายุจากลักษณะกายภาพ'},{no:64,sec:'C',text:'การรับวัตถุดิบตรวจสอบก่อนรับ'},{no:65,sec:'C',text:'วัตถุดิบที่ใช้ประจำวันเตรียมพอดีกับยอดขาย'},{no:66,sec:'C',text:'การทำความสะอาดภาชนะก่อนนำวัตถุดิบใส่'},{no:67,sec:'C',text:'สินค้าในสต็อกตรงกับระบบ'},{no:68,sec:'C',text:'ไม่พบสิ่งปนเปื้อนในวัตถุดิบ'},{no:69,sec:'C',text:'การระบุ Lot / Batch ของวัตถุดิบที่รับ'},{no:70,sec:'C',text:'การทิ้งวัตถุดิบที่ไม่ผ่านมาตรฐานทันที'},{no:71,sec:'C',text:'บันทึกการทิ้งวัตถุดิบครบถ้วน'},{no:72,sec:'C',text:'วัตถุดิบไม่สัมผัสพื้นโดยตรง'},{no:73,sec:'C',text:'การจัดการวัตถุดิบส่วนเกินถูกต้อง'},{no:74,sec:'C',text:'ไม่พบสัตว์รบกวนในพื้นที่จัดเก็บวัตถุดิบ'},
@@ -405,57 +459,55 @@ const ITEMS = [
   {no:162,sec:'K',text:'มี SOP และพนักงานปฏิบัติตาม'},{no:163,sec:'K',text:'การ Briefing พนักงานก่อนเปิดร้าน'},{no:164,sec:'K',text:'การบันทึกยอดขายและสต็อกประจำวัน'},{no:165,sec:'K',text:'การรายงานปัญหาต่อหัวหน้าทันที'},{no:166,sec:'K',text:'แผนการเปิด-ปิดร้านตามมาตรฐาน'},{no:167,sec:'K',text:'การอบรมพนักงานใหม่ตามกำหนด'},
 ];
 
-// ════════════ STATE ════════════
-let answers={}, remarks={}, photos={}, currentSec='A', chartInstance=null;
+// ════ STATE ════
+let answers={},remarks={},photos={},currentSec='A',chartInstance=null;
 
 function initSectionsOverview(){
   document.getElementById('sections-overview').innerHTML=SECTIONS.map(s=>`
     <div class="flex items-center justify-between py-1.5">
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-sm text-primary">${s.icon}</span>
-        <span class="text-xs font-bold text-on-surface">${s.code} · ${s.name}</span>
+        <span class="text-xs font-bold">${s.code} · ${s.name}</span>
       </div>
-      <span class="text-[10px] font-bold text-outline uppercase">${s.weight}pt</span>
+      <span class="text-[10px] font-bold text-outline">${s.weight}pt</span>
     </div>`).join('');
 }
 
-// ════════════ NAVIGATION ════════════
+// ════ STEP NAV ════
 function setStep(n){
-  if(n===2 && !validateStep1()) return;
-  if(n===3 && Object.keys(answers).length < ITEMS.length) return;
   [1,2,3].forEach(i=>{
     document.getElementById('step'+i).classList.toggle('hidden',i!==n);
     const sn=document.getElementById('snav-'+i);
     if(sn){
-      sn.classList.toggle('bg-white/20',i===n); sn.classList.toggle('border-l-4',i===n);
-      sn.classList.toggle('border-white',i===n); sn.classList.toggle('font-bold',i===n);
-      sn.classList.toggle('text-white',i===n); sn.classList.toggle('text-white/60',i!==n);
+      const on=i===n;
+      sn.className=`w-full text-left py-3.5 px-5 flex items-center gap-3 rounded-sm transition-all ${on?'bg-white/20 border-l-4 border-white text-white font-bold':'text-white/60 hover:bg-white/10'}`;
     }
   });
   const titles=['','Branch Information','Inspection Checklist','Audit Dashboard'];
   const subs=['','กรอกข้อมูลสาขาก่อนเริ่มตรวจ','เลือก Pass / Fail ทุกรายการ','ผลสรุปการตรวจสาขา'];
   document.getElementById('topBarTitle').textContent=titles[n];
   document.getElementById('topBarSub').textContent=subs[n];
-  document.getElementById('stepBadge').textContent=`Step ${n} / 3`;
+  document.getElementById('stepBadge').textContent=`${n}/3`;
   document.getElementById('liveScoreBox').style.display=n===2?'block':'none';
-  window.scrollTo(0,0);
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 function validateStep1(){
   if(!document.getElementById('branchCode').value||!document.getElementById('inspector').value.trim()){
-    alert('กรุณาเลือกสาขาและกรอกชื่อผู้ตรวจก่อนครับ'); return false;
+    alert('กรุณาเลือกสาขาและกรอกชื่อผู้ตรวจก่อนครับ');return false;
   }
   return true;
 }
 function goToStep1(){setStep(1);}
-function goToStep2(){if(!validateStep1()) return; buildChecklist(); setStep(2);}
-function goToStep3(){buildDashboard(); setStep(3);}
+function goToStep2(){if(!validateStep1())return;buildChecklist();setStep(2);}
+function goToStep3(){buildDashboard();setStep(3);}
 
-// ════════════ CHECKLIST ════════════
+// ════ CHECKLIST ════
 function buildChecklist(){
   document.getElementById('sectionNav').innerHTML=SECTIONS.map(s=>`
     <button id="stab-${s.code}" onclick="switchSection('${s.code}')"
-      class="sec-tab ${s.code===currentSec?'grad-btn text-white':'bg-surface-container-lowest text-on-surface-variant border border-outline-variant/30'} text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-sm flex items-center gap-1.5 transition-all">
-      <span class="material-symbols-outlined text-base">${s.icon}</span>${s.code}
+      class="sec-tab flex-shrink-0 text-[10px] font-bold uppercase tracking-widest px-3 py-2 rounded-lg flex items-center gap-1.5 transition-all whitespace-nowrap
+      ${s.code===currentSec?'grad-btn text-white shadow-md':'bg-surface-container-lowest text-on-surface-variant border border-outline-variant/30'}">
+      <span class="material-symbols-outlined text-sm">${s.icon}</span>${s.code}
     </button>`).join('');
   renderSection(currentSec);
 }
@@ -467,9 +519,8 @@ function switchSection(code){
     const items=ITEMS.filter(i=>i.sec===c);
     const ans=items.filter(i=>answers[i.no]!==undefined).length;
     const fail=items.filter(i=>answers[i.no]==='fail').length;
-    const isActive=c===code;
-    t.className=`sec-tab text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-sm flex items-center gap-1.5 transition-all ${
-      isActive?'grad-btn text-white':
+    t.className=`sec-tab flex-shrink-0 text-[10px] font-bold uppercase tracking-widest px-3 py-2 rounded-lg flex items-center gap-1.5 transition-all whitespace-nowrap ${
+      c===code?'grad-btn text-white shadow-md':
       ans===items.length&&fail>0?'bg-red-50 text-red-700 border border-red-200':
       ans===items.length?'bg-green-50 text-green-700 border border-green-200':
       'bg-surface-container-lowest text-on-surface-variant border border-outline-variant/30'}`;
@@ -484,25 +535,25 @@ function renderSection(code){
   const failed=items.filter(i=>answers[i.no]==='fail').length;
   const pct=answered===items.length?((items.length-failed)/items.length*100).toFixed(1):'—';
   document.getElementById('sectionContent').innerHTML=`
-    <div class="bg-surface-container-lowest rounded-lg mb-4" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.08)">
-      <div class="p-6 flex items-center gap-4 border-b border-outline-variant/15">
-        <div class="w-12 h-12 rounded-sm flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#FF6B00,#0052FF)">
-          <span class="material-symbols-outlined filled text-white text-2xl">${sec.icon}</span>
+    <div class="bg-surface-container-lowest rounded-xl mb-4 shadow-md overflow-hidden">
+      <div class="p-4 lg:p-6 flex items-center gap-4 border-b border-outline-variant/10">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 grad-v">
+          <span class="material-symbols-outlined filled text-white text-xl">${sec.icon}</span>
         </div>
-        <div class="flex-1">
-          <h3 class="text-lg font-black serif">${sec.name}</h3>
-          <p class="text-xs text-outline uppercase tracking-widest">${sec.nameTH} · Weight: ${sec.weight} pts</p>
+        <div class="flex-1 min-w-0">
+          <h3 class="text-base font-black serif truncate">${sec.name}</h3>
+          <p class="text-[10px] text-outline uppercase tracking-widest">${sec.nameTH} · ${sec.weight}pts</p>
         </div>
-        <div class="text-right">
-          <p class="text-2xl font-black text-on-surface font-['Noto_Serif']">${answered}/${items.length}</p>
-          <p class="text-xs text-outline uppercase tracking-widest">${pct}% pass</p>
+        <div class="text-right flex-shrink-0">
+          <p class="text-xl font-black font-['Noto_Serif']">${answered}/${items.length}</p>
+          <p class="text-[10px] text-outline uppercase">${pct}% pass</p>
         </div>
       </div>
-      <div class="p-6 space-y-3">${items.map(item=>renderItem(item)).join('')}</div>
+      <div class="divide-y divide-outline-variant/10">${items.map(item=>renderItem(item)).join('')}</div>
     </div>
-    <div class="flex justify-end gap-3 mb-20">
-      ${code!=='A'?`<button onclick="prevSection('${code}')" class="bg-surface-container-lowest border border-outline-variant/30 text-on-surface-variant text-sm font-bold uppercase tracking-widest px-5 py-2.5 rounded-sm flex items-center gap-2"><span class="material-symbols-outlined text-base">arrow_back</span>หมวดก่อน</button>`:''}
-      ${code!=='K'?`<button onclick="nextSection('${code}')" class="grad-btn text-white text-sm font-bold uppercase tracking-widest px-5 py-2.5 rounded-sm flex items-center gap-2">หมวดถัดไป<span class="material-symbols-outlined text-base">arrow_forward</span></button>`:''}
+    <div class="flex gap-3 mb-24 lg:mb-10">
+      ${code!=='A'?`<button onclick="prevSection('${code}')" class="flex-1 bg-surface-container-lowest border border-outline-variant/30 text-on-surface-variant text-xs font-bold uppercase tracking-widest py-4 rounded-xl flex items-center justify-center gap-2 shadow-sm"><span class="material-symbols-outlined text-base">arrow_back</span>ก่อน</button>`:'<div class="flex-1"></div>'}
+      ${code!=='K'?`<button onclick="nextSection('${code}')" class="flex-1 grad-btn text-white text-xs font-bold uppercase tracking-widest py-4 rounded-xl flex items-center justify-center gap-2 shadow-md">ถัดไป<span class="material-symbols-outlined text-base">arrow_forward</span></button>`:''}
     </div>`;
 }
 
@@ -510,36 +561,32 @@ function renderItem(item){
   const ans=answers[item.no];
   const rem=remarks[item.no]||'';
   const ph=photos[item.no]||[];
-  const bg=ans==='pass'?'bg-green-50 border-green-200':ans==='fail'?'bg-red-50 border-red-200':'bg-surface-container-lowest border-outline-variant/20';
-  return `<div class="border rounded-sm p-4 transition-all ${bg}" id="item-${item.no}">
+  const bg=ans==='pass'?'bg-green-50':ans==='fail'?'bg-red-50':'';
+  return `<div class="p-4 transition-all ${bg}" id="item-${item.no}">
     <div class="flex items-start gap-3">
-      <span class="text-[10px] font-bold text-outline mt-1 min-w-[28px]">${item.no}</span>
-      <p class="flex-1 text-sm text-on-surface leading-relaxed">${item.text}</p>
-      <div class="flex gap-2 flex-shrink-0">
-        <button onclick="setAnswer(${item.no},'pass')" class="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-sm border transition-all ${ans==='pass'?'bg-green-600 text-white border-green-600':'bg-white text-green-700 border-green-300 hover:border-green-600'}">
-          <span class="material-symbols-outlined text-sm align-middle">check</span> Pass
-        </button>
-        <button onclick="setAnswer(${item.no},'fail')" class="text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-sm border transition-all ${ans==='fail'?'bg-red-600 text-white border-red-600':'bg-white text-red-700 border-red-300 hover:border-red-600'}">
-          <span class="material-symbols-outlined text-sm align-middle">close</span> Fail
-        </button>
-      </div>
+      <span class="text-[10px] font-bold text-outline mt-1 min-w-[24px] flex-shrink-0">${item.no}</span>
+      <p class="flex-1 text-sm leading-relaxed">${item.text}</p>
     </div>
-    <!-- Photo + remark: always visible after answer -->
+    <!-- Pass/Fail buttons — full width on mobile -->
+    <div class="flex gap-2 mt-3 ml-9">
+      <button onclick="setAnswer(${item.no},'pass')" class="flex-1 min-h-[44px] text-xs font-bold uppercase tracking-wider rounded-xl border-2 transition-all ${ans==='pass'?'bg-green-600 text-white border-green-600':'bg-white text-green-700 border-green-300'}">
+        <span class="material-symbols-outlined text-base align-middle mr-1">check</span>Pass
+      </button>
+      <button onclick="setAnswer(${item.no},'fail')" class="flex-1 min-h-[44px] text-xs font-bold uppercase tracking-wider rounded-xl border-2 transition-all ${ans==='fail'?'bg-red-600 text-white border-red-600':'bg-white text-red-700 border-red-300'}">
+        <span class="material-symbols-outlined text-base align-middle mr-1">close</span>Fail
+      </button>
+    </div>
     ${ans?`
     <div class="mt-3 ml-9 space-y-2">
-      ${ans==='fail'?`<input value="${rem}" oninput="setRemark(${item.no},this.value)" placeholder="📝 ระบุปัญหาที่พบ..." class="w-full bg-white border border-red-200 focus:border-red-400 rounded-sm py-2 px-3 text-sm text-red-900 outline-none font-['Manrope']"/>`:''}
-      <!-- Photo upload (all items) -->
-      <div class="flex items-center gap-3 flex-wrap">
-        <label class="flex items-center gap-2 cursor-pointer bg-white border ${ans==='fail'?'border-orange-300 hover:border-orange-500 text-orange-700':'border-outline-variant/40 hover:border-outline text-outline'} px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider transition-all">
-          <span class="material-symbols-outlined text-base">add_a_photo</span> แนบรูป
-          <input type="file" accept="image/*" multiple style="display:none" onchange="addPhotos(${item.no},this)"/>
-        </label>
-        ${ph.length>0?`<span class="text-xs text-outline">${ph.length} รูป</span>`:''}
-      </div>
-      ${ph.length>0?`<div class="flex flex-wrap gap-2">${ph.map((p,i)=>`
-        <div class="relative w-16 h-16 rounded-sm overflow-hidden border ${ans==='fail'?'border-red-200':'border-outline-variant/30'} cursor-pointer group" onclick="openLightbox('${p}','รายการ ${item.no}')">
+      ${ans==='fail'?`<textarea rows="2" oninput="setRemark(${item.no},this.value)" placeholder="📝 ระบุปัญหาที่พบ..." class="w-full bg-white border border-red-200 focus:border-red-400 rounded-xl py-2.5 px-3 text-sm text-red-900 outline-none resize-none">${rem}</textarea>`:''}
+      <label class="inline-flex items-center gap-2 cursor-pointer bg-white border ${ans==='fail'?'border-orange-300 text-orange-700':'border-outline-variant/40 text-outline'} px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider min-h-[44px]">
+        <span class="material-symbols-outlined text-lg">add_a_photo</span>แนบรูป${ph.length?` (${ph.length})`:''}
+        <input type="file" accept="image/*" multiple capture="environment" style="display:none" onchange="addPhotos(${item.no},this)"/>
+      </label>
+      ${ph.length?`<div class="flex flex-wrap gap-2">${ph.map((p,i)=>`
+        <div class="relative w-20 h-20 rounded-xl overflow-hidden border-2 ${ans==='fail'?'border-red-200':'border-outline-variant/30'} cursor-pointer group" onclick="openLightbox('${p}','รายการ ${item.no}')">
           <img src="${p}" class="w-full h-full object-cover"/>
-          <button onclick="event.stopPropagation();removePhoto(${item.no},${i})" class="absolute top-0.5 right-0.5 bg-red-600 text-white rounded-full w-4 h-4 text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
+          <button onclick="event.stopPropagation();removePhoto(${item.no},${i})" class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center font-bold">✕</button>
         </div>`).join('')}</div>`:''}
     </div>`:''}
   </div>`;
@@ -547,7 +594,7 @@ function renderItem(item){
 
 function setAnswer(no,val){
   answers[no]=val;
-  if(val==='pass'){delete remarks[no];}
+  if(val==='pass') delete remarks[no];
   updateProgress();
   const item=ITEMS.find(i=>i.no===no);
   const el=document.getElementById('item-'+no);
@@ -558,116 +605,113 @@ function setRemark(no,val){remarks[no]=val;}
 function addPhotos(no,input){
   if(!photos[no]) photos[no]=[];
   Array.from(input.files).forEach(f=>{
-    const reader=new FileReader();
-    reader.onload=e=>{photos[no].push(e.target.result); renderSection(currentSec);};
-    reader.readAsDataURL(f);
+    const r=new FileReader();
+    r.onload=e=>{photos[no].push(e.target.result);renderSection(currentSec);};
+    r.readAsDataURL(f);
   });
 }
-function removePhoto(no,idx){photos[no].splice(idx,1); renderSection(currentSec);}
+function removePhoto(no,idx){photos[no].splice(idx,1);renderSection(currentSec);}
 function openLightbox(src,cap){
   document.getElementById('lbImg').src=src;
   document.getElementById('lbCaption').textContent=cap;
   document.getElementById('lightbox').classList.add('open');
 }
 function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
-function nextSection(code){const idx=SECTIONS.findIndex(s=>s.code===code);if(idx<SECTIONS.length-1)switchSection(SECTIONS[idx+1].code);}
-function prevSection(code){const idx=SECTIONS.findIndex(s=>s.code===code);if(idx>0)switchSection(SECTIONS[idx-1].code);}
+function nextSection(c){const i=SECTIONS.findIndex(s=>s.code===c);if(i<SECTIONS.length-1)switchSection(SECTIONS[i+1].code);}
+function prevSection(c){const i=SECTIONS.findIndex(s=>s.code===c);if(i>0)switchSection(SECTIONS[i-1].code);}
 
 function updateProgress(){
-  const total=ITEMS.length;
-  const answered=ITEMS.filter(i=>answers[i.no]!==undefined).length;
-  const pct=(answered/total*100).toFixed(0);
+  const total=ITEMS.length,answered=ITEMS.filter(i=>answers[i.no]!==undefined).length;
   document.getElementById('progressText').textContent=`${answered} / ${total} รายการ`;
-  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressFill').style.width=(answered/total*100)+'%';
   document.getElementById('btnFinish').disabled=answered<total;
-  const score=calcScore();
-  document.getElementById('scoreLive').textContent=score.net.toFixed(1)+'%';
-  document.getElementById('scoreLiveBar').style.width=Math.min(score.net,100)+'%';
+  const s=calcScore();
+  document.getElementById('scoreLive').textContent=s.net.toFixed(1)+'%';
+  document.getElementById('scoreLiveBar').style.width=Math.min(s.net,100)+'%';
 }
 
-// ════════════ SCORE ════════════
+// ════ SCORE ════
 function calcScore(){
-  let totalDeduct=0;
+  let td=0;
   const secResults=SECTIONS.map(s=>{
     const items=ITEMS.filter(i=>i.sec===s.code);
     const deduct=items.filter(i=>answers[i.no]==='fail').length;
-    const total=items.length;
-    const pct=total>0?(total-deduct)/total*100:100;
-    const deductPts=s.weight*(deduct/total);
-    totalDeduct+=deductPts;
-    return{...s,total,deduct,pct,earned:s.weight-deductPts};
+    const pct=(items.length-deduct)/items.length*100;
+    const dp=s.weight*(deduct/items.length);
+    td+=dp;
+    return{...s,total:items.length,deduct,pct,earned:s.weight-dp};
   });
-  return{secResults,net:100-totalDeduct,totalDeduct};
+  return{secResults,net:100-td};
 }
 function getGrade(p){
-  if(p>=90) return{label:'⭐ ดีมาก',sub:'Excellence',cls:'text-green-700 bg-green-50'};
-  if(p>=85) return{label:'✅ มาตรฐาน',sub:'Standard',cls:'text-blue-700 bg-blue-50'};
-  if(p>=70) return{label:'⚠️ ปรับปรุง',sub:'Improve',cls:'text-yellow-700 bg-yellow-50'};
+  if(p>=90)return{label:'⭐ ดีมาก',sub:'Excellence',cls:'text-green-700 bg-green-50'};
+  if(p>=85)return{label:'✅ มาตรฐาน',sub:'Standard',cls:'text-blue-700 bg-blue-50'};
+  if(p>=70)return{label:'⚠️ ปรับปรุง',sub:'Improve',cls:'text-yellow-700 bg-yellow-50'};
   return{label:'🚨 แก้ไขเร่งด่วน',sub:'Break Down',cls:'text-red-700 bg-red-50'};
 }
 function barColor(p){return p>=90?'#16a34a':p>=85?'#2563eb':p>=70?'#d97706':'#dc2626';}
 
-// ════════════ DASHBOARD ════════════
+// ════ DASHBOARD ════
 function buildDashboard(){
   const{secResults,net}=calcScore();
   const grade=getGrade(net);
   const branch=document.getElementById('branchCode');
-  const branchName=branch.options[branch.selectedIndex].text;
+  const bName=branch.options[branch.selectedIndex].text;
   const date=document.getElementById('auditDate').value;
-  const inspector=document.getElementById('inspector').value;
-  const manager=document.getElementById('manager').value;
-  const totalFail=ITEMS.filter(i=>answers[i.no]==='fail').length;
-  const totalPass=ITEMS.length-totalFail;
-  const totalPhotos=Object.values(photos).reduce((a,b)=>a+b.length,0);
+  const insp=document.getElementById('inspector').value;
+  const mgr=document.getElementById('manager').value;
+  const fails=ITEMS.filter(i=>answers[i.no]==='fail').length;
+  const totalPh=Object.values(photos).reduce((a,b)=>a+b.length,0);
 
   document.getElementById('heroCard').innerHTML=`
-    <div class="w-28 h-28 rounded-full border-4 flex flex-col items-center justify-center flex-shrink-0" style="border-color:#FF6B00">
-      <span class="text-3xl font-black font-['Noto_Serif']" style="color:#FF6B00">${net.toFixed(1)}</span>
-      <span class="text-xs text-white/60">%</span>
+    <div class="w-20 h-20 lg:w-28 lg:h-28 rounded-full border-4 flex flex-col items-center justify-center flex-shrink-0" style="border-color:#FF6B00">
+      <span class="text-2xl lg:text-3xl font-black font-['Noto_Serif']" style="color:#FF6B00">${net.toFixed(1)}</span>
+      <span class="text-[10px] text-white/50">%</span>
     </div>
-    <div class="flex-1">
-      <p class="text-[10px] uppercase tracking-widest font-bold mb-1" style="color:#FF6B00">${branchName}</p>
-      <h1 class="text-2xl font-black text-white font-['Noto_Serif'] mb-2">Audit Result</h1>
-      <p class="text-white/60 text-xs leading-relaxed">📅 ${date} &nbsp;·&nbsp; 👤 ${inspector} &nbsp;·&nbsp; 🏪 ${manager||'—'} &nbsp;·&nbsp; 🔑 EMP ${currentUser}</p>
-      <span class="inline-block mt-3 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-sm ${grade.cls}">${grade.label} — ${grade.sub}</span>
+    <div class="flex-1 min-w-0">
+      <p class="text-[10px] uppercase tracking-widest font-bold mb-1 truncate" style="color:#FF6B00">${bName}</p>
+      <h1 class="text-xl lg:text-2xl font-black text-white font-['Noto_Serif'] mb-2">Audit Result</h1>
+      <p class="text-white/50 text-xs leading-relaxed hidden sm:block">📅 ${date} · 👤 ${insp} · 🏪 ${mgr||'—'}</p>
+      <p class="text-white/50 text-xs sm:hidden">📅 ${date}</p>
+      <span class="inline-block mt-2 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-lg ${grade.cls}">${grade.label}</span>
     </div>`;
 
   document.getElementById('kpiGrid').innerHTML=[
-    {val:167,lbl:'Total Items',icon:'assignment',c:'border-orange-400'},
-    {val:totalPass,lbl:'Passed',icon:'check_circle',c:'border-green-500'},
-    {val:totalFail,lbl:'Failed',icon:'cancel',c:'border-red-500'},
-    {val:totalPhotos,lbl:'Photos',icon:'photo_library',c:'border-blue-500'},
+    {val:167,lbl:'Total',icon:'assignment',c:'border-orange-400'},
+    {val:ITEMS.length-fails,lbl:'Passed',icon:'check_circle',c:'border-green-500'},
+    {val:fails,lbl:'Failed',icon:'cancel',c:'border-red-500'},
+    {val:totalPh,lbl:'Photos',icon:'photo_library',c:'border-blue-500'},
   ].map(k=>`
-    <div class="bg-surface-container-lowest rounded-lg p-5 border-l-4 ${k.c}" style="box-shadow:0 12px 32px -4px rgba(38,24,18,0.08)">
-      <div class="flex justify-between items-start mb-3">
+    <div class="bg-surface-container-lowest rounded-xl p-4 border-l-4 ${k.c} shadow-md">
+      <div class="flex justify-between items-start mb-2">
         <p class="text-[10px] uppercase tracking-widest font-bold text-outline">${k.lbl}</p>
-        <span class="material-symbols-outlined text-outline text-lg">${k.icon}</span>
+        <span class="material-symbols-outlined text-outline text-base">${k.icon}</span>
       </div>
-      <p class="text-3xl font-black text-on-surface font-['Noto_Serif']">${k.val}</p>
+      <p class="text-2xl lg:text-3xl font-black font-['Noto_Serif']">${k.val}</p>
     </div>`).join('');
 
-  if(chartInstance) chartInstance.destroy();
+  if(chartInstance)chartInstance.destroy();
   chartInstance=new Chart(document.getElementById('resultChart'),{
     type:'bar',
-    data:{labels:secResults.map(s=>s.code),datasets:[{data:secResults.map(s=>s.pct),backgroundColor:secResults.map(s=>barColor(s.pct)),borderRadius:2}]},
+    data:{labels:secResults.map(s=>s.code),datasets:[{data:secResults.map(s=>s.pct),backgroundColor:secResults.map(s=>barColor(s.pct)),borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{y:{min:60,max:100,ticks:{callback:v=>v+'%',font:{family:'Manrope',size:10}},grid:{color:'rgba(142,113,100,0.1)'}},
+      scales:{y:{min:60,max:100,ticks:{callback:v=>v+'%',font:{family:'Manrope',size:10}},grid:{color:'rgba(142,113,100,0.08)'}},
         x:{ticks:{font:{family:'Manrope',size:10,weight:'700'}},grid:{display:false}}}}
   });
 
   document.getElementById('resultTable').innerHTML=secResults.map(s=>`
-    <div class="flex items-center gap-3 py-2">
-      <span class="w-7 h-7 rounded-sm flex items-center justify-center text-white text-xs font-black flex-shrink-0" style="background:linear-gradient(135deg,#FF6B00,#0052FF)">${s.code}</span>
+    <div class="flex items-center gap-3 py-1.5">
+      <span class="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-black flex-shrink-0 grad-v">${s.code}</span>
       <div class="flex-1 min-w-0">
         <div class="flex justify-between mb-1">
-          <span class="text-xs font-bold text-on-surface truncate">${s.name}</span>
-          <span class="text-xs font-black ml-2" style="color:${barColor(s.pct)}">${s.pct.toFixed(1)}%</span>
+          <span class="text-xs font-bold truncate">${s.name}</span>
+          <span class="text-xs font-black ml-2 flex-shrink-0" style="color:${barColor(s.pct)}">${s.pct.toFixed(1)}%</span>
         </div>
-        <div class="h-1 bg-surface-container-high rounded-full overflow-hidden">
-          <div class="h-1 rounded-full" style="width:${s.pct}%;background:${barColor(s.pct)}"></div>
+        <div class="h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+          <div class="h-1.5 rounded-full" style="width:${s.pct}%;background:${barColor(s.pct)}"></div>
         </div>
       </div>
-      ${s.deduct>0?`<span class="text-[10px] font-bold text-red-600 flex-shrink-0">-${s.deduct}</span>`:'<span class="material-symbols-outlined text-green-600 text-base flex-shrink-0">check</span>'}
+      ${s.deduct>0?`<span class="text-[10px] font-bold text-red-600 flex-shrink-0">-${s.deduct}</span>`:`<span class="material-symbols-outlined text-green-600 text-base flex-shrink-0">check</span>`}
     </div>`).join('');
 
   const failItems=ITEMS.filter(i=>answers[i.no]==='fail');
@@ -675,11 +719,11 @@ function buildDashboard(){
   document.getElementById('failList').innerHTML=failItems.length===0
     ?'<p class="text-green-600 font-bold text-center py-6">🎉 ไม่มีรายการที่ไม่ผ่าน!</p>'
     :failItems.map(item=>`
-    <div class="border-l-2 border-red-400 pl-4 py-3 mb-3 bg-red-50 rounded-r-sm">
-      <p class="text-[10px] uppercase tracking-wider text-red-500 font-bold mb-1">รายการ ${item.no} · Section ${item.sec}</p>
-      <p class="text-sm font-semibold text-on-surface">${item.text}</p>
+    <div class="border-l-4 border-red-400 pl-4 py-3 mb-3 bg-red-50 rounded-r-xl">
+      <p class="text-[10px] uppercase tracking-wider text-red-500 font-bold mb-1">No.${item.no} · ${item.sec}</p>
+      <p class="text-sm font-semibold">${item.text}</p>
       ${remarks[item.no]?`<p class="text-xs text-outline mt-1">📝 ${remarks[item.no]}</p>`:''}
-      ${photos[item.no]&&photos[item.no].length?`<div class="flex gap-2 mt-2">${photos[item.no].map(p=>`<div class="w-14 h-14 rounded-sm overflow-hidden border border-red-200 cursor-pointer" onclick="openLightbox('${p}','รายการ ${item.no}')"><img src="${p}" class="w-full h-full object-cover"/></div>`).join('')}</div>`:''}
+      ${photos[item.no]?.length?`<div class="flex gap-2 mt-2 flex-wrap">${photos[item.no].map(p=>`<div class="w-14 h-14 rounded-lg overflow-hidden border border-red-200 cursor-pointer flex-shrink-0" onclick="openLightbox('${p}','No.${item.no}')"><img src="${p}" class="w-full h-full object-cover"/></div>`).join('')}</div>`:''}
     </div>`).join('');
 }
 
