@@ -50,6 +50,23 @@ fontFamily:{"headline":["Noto Serif"],"body":["Manrope"],"label":["Manrope"]}}}}
   #drawerOverlay.open{display:block;opacity:1}
   /* Active states for touch */
   button:active,label:active{transform:scale(.97)}
+  /* ══ PRINT / PDF ══ */
+  @media print{
+    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+    #loginScreen,#drawer,#drawerOverlay,header,#step1,#step2,
+    .fixed.bottom-0,nav,#liveScoreBox,.no-print{display:none!important}
+    #mainApp,main,#step3{display:block!important;margin:0!important;padding:0!important;width:100%!important}
+    main{margin-left:0!important;padding-top:0!important}
+    #step3{display:block!important;padding:16px!important}
+    body{background:#fff!important;font-size:11pt}
+    .rounded-xl,.rounded-lg{border-radius:4px!important}
+    .shadow-md,.shadow-xl,.shadow-2xl{box-shadow:none!important}
+    canvas{max-width:100%!important}
+    .grad-v,.grad,.grad-btn{background:#FF6B00!important;-webkit-print-color-adjust:exact}
+    #heroCard{background:linear-gradient(135deg,#1a1a2e,#16213e)!important;-webkit-print-color-adjust:exact}
+    .page-break{page-break-before:always}
+    @page{margin:15mm;size:A4 portrait}
+  }
 </style>
 </head>
 <body class="bg-surface text-on-surface min-h-screen">
@@ -124,9 +141,9 @@ fontFamily:{"headline":["Noto Serif"],"body":["Manrope"],"label":["Manrope"]}}}}
           </button>
         </div>
         <div class="mt-5 bg-primary-fixed rounded-lg p-4">
-          <p class="text-[10px] uppercase tracking-widest font-bold text-on-primary-fixed mb-2">Demo Account</p>
+          <p class="text-[10px] uppercase tracking-widest font-bold text-on-primary-fixed mb-2">ข้อมูลการเข้าระบบ</p>
           <div class="grid grid-cols-2 gap-3 text-xs">
-            <div><span class="text-outline text-[10px] uppercase tracking-wide block">รหัสพนักงาน</span><span class="font-black text-on-surface text-base">123456</span></div>
+            <div><span class="text-outline text-[10px] uppercase tracking-wide block">รหัสพนักงาน</span><span class="font-black text-on-surface text-sm">เลขรหัสพนักงาน</span></div>
             <div><span class="text-outline text-[10px] uppercase tracking-wide block">รหัสผ่าน</span><span class="font-black text-on-surface text-base">1234</span></div>
           </div>
         </div>
@@ -204,8 +221,8 @@ fontFamily:{"headline":["Noto Serif"],"body":["Manrope"],"label":["Manrope"]}}}}
       <p class="text-[10px] text-outline hidden sm:block" id="topBarSub">กรอกข้อมูลสาขาก่อนเริ่มตรวจ</p>
     </div>
     <span class="bg-primary-fixed text-on-primary-fixed text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-sm flex-shrink-0" id="stepBadge">1/3</span>
-    <button onclick="window.print()" class="hidden sm:flex w-9 h-9 items-center justify-center hover:bg-surface-container-low rounded-sm">
-      <span class="material-symbols-outlined text-outline text-xl">print</span>
+    <button onclick="exportPDF()" class="hidden sm:flex w-9 h-9 items-center justify-center hover:bg-surface-container-low rounded-sm" title="Export PDF">
+      <span class="material-symbols-outlined text-outline text-xl">picture_as_pdf</span>
     </button>
   </header>
 
@@ -233,19 +250,95 @@ fontFamily:{"headline":["Noto Serif"],"body":["Manrope"],"label":["Manrope"]}}}}
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="sm:col-span-2">
               <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">สาขา / Branch</label>
-              <select id="branchCode" class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-lg py-3.5 px-4 text-sm outline-none transition-colors">
+              <select id="branchCode" onchange="onBranchChange()" class="w-full bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-lg py-3.5 px-4 text-sm outline-none transition-colors">
                 <option value="">— เลือกสาขา —</option>
-                <option value="5001">5001 — Fashion Island</option><option value="5002">5002 — Seacon Srinakarin</option>
-                <option value="5003">5003 — The Mall Thapra</option><option value="5004">5004 — CT Rattanathibet</option>
-                <option value="5005">5005 — The Mall Bangkapi</option><option value="5007">5007 — CT Rama 2</option>
-                <option value="5010">5010 — Passion Rayong</option><option value="5011">5011 — The Mall Ngamwongwan</option>
-                <option value="5012">5012 — LT Bangplee</option><option value="5013">5013 — Laemthong Bangsaen</option>
-                <option value="5014">5014 — Big C Extra Middle Pattaya</option><option value="5015">5015 — Pacific Park Sriracha</option>
-                <option value="5016">5016 — Imperial World Samrong</option><option value="5017">5017 — Seacon Bangkae</option>
-                <option value="5018">5018 — CT Ramintra</option><option value="5019">5019 — Terminal 21 Asok</option>
-                <option value="5023">5023 — Big C Extra South Pattaya</option><option value="5024">5024 — The Mall Bangkae</option>
-                <option value="5025">5025 — Big C Extra Srinakarin</option><option value="5049">5049 — LT Chonburi</option>
+                <optgroup label="BZM: นิรุต เจริญศิลป์">
+                  <option value="5005">5005 เดอะมอลล์ บางกะปิ</option>
+                  <option value="5010">5010 แพชชั่น ระยอง</option>
+                  <option value="5019">5019 เทอมินอล 21 อโศก</option>
+                  <option value="5038">5038 เซ็นทรัล ระยอง</option>
+                  <option value="5044">5044 โลตัส ระยอง</option>
+                  <option value="5046">5046 โลตัส บางกะปิ</option>
+                  <option value="5055">5055 โลตัส สุขาภิบาล 3</option>
+                  <option value="5065">5065 เกตเวย์ เอกมัย</option>
+                  <option value="5074">5074 บิ๊กซี พระราม 4</option>
+                  <option value="5080">5080 โลตัส แกลง</option>
+                  <option value="5088">5088 สยามสแควร์</option>
+                </optgroup>
+                <optgroup label="BZM: นพชัย จันทร์รุ่ง">
+                  <option value="5001">5001 แฟชั่นไอส์แลนด์</option>
+                  <option value="5002">5002 ซีคอน ศรีนครินทร์</option>
+                  <option value="5016">5016 อิมพีเรียล สำโรง</option>
+                  <option value="5041">5041 เซ็นทรัล พระราม3</option>
+                  <option value="5045">5045 พรอมนาท</option>
+                  <option value="5069">5069 โลตัส พัฒนาการ</option>
+                  <option value="5072">5072 โลตัส สุขาภิบาล 1</option>
+                  <option value="5084">5084 เทอมินอลพระราม 3</option>
+                  <option value="5085">5085 ICS ไอคอนสยาม</option>
+                  <option value="5087">5087 ศุนย์ประชุมสิริกิตย์</option>
+                  <option value="5091">5091 PTT เกษตรนวมินทร์</option>
+                </optgroup>
+                <optgroup label="BZM: พัทธดนย์ วัฒนายุทธ">
+                  <option value="5003">5003 เดอะมอลล์ ท่าพระ</option>
+                  <option value="5007">5007 เซ็นทรัล พระราม2</option>
+                  <option value="5017">5017 ซีคอนบางแค</option>
+                  <option value="5021">5021 เซ็นทรัล ปิ่นเกล้า</option>
+                  <option value="5024">5024 เดอะมอลล์ บางแค</option>
+                  <option value="5031">5031 เซ็นทรัล ศาลายา</option>
+                  <option value="5034">5034 โลตัส ศาลายา</option>
+                  <option value="5036">5036 โลตัส บางประกอก</option>
+                  <option value="5040">5040 เซ็นทรัล เวสเกต</option>
+                  <option value="5054">5054 บิ๊กซี บางใหญ่</option>
+                  <option value="5071">5071 โลตัส จรัญสนิทวงศ์</option>
+                </optgroup>
+                <optgroup label="BZM: สีวิกา สังข์ด้วง">
+                  <option value="5004">5004 เซ็นทรัล รัตนาธิเบศธ์</option>
+                  <option value="5011">5011 เดอะมอลล์งามวงค์วาน</option>
+                  <option value="5028">5028 โลตัส ปทุมธานี</option>
+                  <option value="5042">5042 ฟิวเจอร์ รังสิต</option>
+                  <option value="5052">5052 โลตัส นวนคร</option>
+                  <option value="5057">5057 โลตัส รังสิต</option>
+                  <option value="5066">5066 เกตเวย์ บางซื่อ</option>
+                  <option value="5070">5070 พันธุ์ทิพย์งามวงศ์วาน</option>
+                  <option value="5076">5076 บิ๊กซี ติวานนท์</option>
+                  <option value="5082">5082 มาร์เกตเพลสวงศ์สว่าง</option>
+                </optgroup>
+                <optgroup label="BZM: อนุรักษ์ สอนภักดี">
+                  <option value="5012">5012 โลตัส บางพลี</option>
+                  <option value="5018">5018 เซ็นทรัล รามอินทรา</option>
+                  <option value="5026">5026 ไอที หลักสี่</option>
+                  <option value="5027">5027 เซ็นทรัล แจ้งวัฒนะ</option>
+                  <option value="5030">5030 เพลินนารี่</option>
+                  <option value="5033">5033 โลตัส แจ้งวัฒนะ</option>
+                  <option value="5047">5047 เซ็นทรัล อีสวิล</option>
+                  <option value="5050">5050 บิ๊กซีบางพลี</option>
+                  <option value="5068">5068 คอสโม เมืองทอง</option>
+                  <option value="5073">5073 โลตัส ลาดพร้าว</option>
+                  <option value="5081">5081 โลตัส ติวานนท์</option>
+                  <option value="5089">5089 FAB</option>
+                  <option value="5090">5090 Oasis</option>
+                </optgroup>
+                <optgroup label="BZM: ศุกร์แสง วัฒนาฟุ้งเจริญ">
+                  <option value="5013">5013 แหลมทองบางแสน</option>
+                  <option value="5014">5014 บิ๊กซี พัทยากลาง</option>
+                  <option value="5015">5015 โรบินสัน ศรีราชา</option>
+                  <option value="5023">5023 บิ๊กซี พัทยาใต้</option>
+                  <option value="5035">5035 เซ็นทรัลพัทยาบีช</option>
+                  <option value="5039">5039 เซ็นทรัล ชลบุรี</option>
+                  <option value="5049">5049 โลตัส ชลบุรี</option>
+                  <option value="5061">5061 บิ๊กซี สัตหีบ</option>
+                  <option value="5062">5062 โรบินสัน ชลบุรี</option>
+                  <option value="5063">5063 โลตัส พนัสนิคม</option>
+                  <option value="5064">5064 เทอร์มินอล พัทยา</option>
+                </optgroup>
               </select>
+            </div>
+            <div class="sm:col-span-2">
+              <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">BZM Area Manager</label>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-3 top-3.5 text-outline text-lg">manage_accounts</span>
+                <input type="text" id="bzmManager" readonly placeholder="เลือกสาขาก่อน" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg py-3.5 pl-10 pr-4 text-sm outline-none text-on-surface-variant"/>
+              </div>
             </div>
             <div>
               <label class="text-[10px] uppercase tracking-widest font-bold text-outline block mb-2">วันที่ตรวจ</label>
@@ -280,7 +373,7 @@ fontFamily:{"headline":["Noto Serif"],"body":["Manrope"],"label":["Manrope"]}}}}
           </div>
           <div class="rounded-xl p-6 grad-v">
             <p class="text-[10px] uppercase tracking-widest font-bold text-white/60 mb-2">Total Items</p>
-            <p class="text-5xl font-black text-white font-['Noto_Serif']">167</p>
+            <p class="text-5xl font-black text-white font-['Noto_Serif']">179</p>
             <p class="text-white/60 text-xs mt-2">11 sections · weighted scoring</p>
           </div>
         </div>
@@ -298,7 +391,7 @@ fontFamily:{"headline":["Noto Serif"],"body":["Manrope"],"label":["Manrope"]}}}}
       <div class="fixed bottom-0 left-0 right-0 lg:left-64 bg-white/95 backdrop-blur-[20px] border-t border-outline-variant/20 px-4 py-3 z-40 safe-bottom">
         <div class="flex items-center gap-3">
           <div class="flex-1 min-w-0">
-            <p class="text-xs font-bold" id="progressText">0 / 167</p>
+            <p class="text-xs font-bold" id="progressText">0 / 179</p>
             <div class="h-1.5 bg-surface-container-high rounded-full mt-1">
               <div class="h-1.5 rounded-full grad-btn transition-all" id="progressFill" style="width:0%"></div>
             </div>
@@ -351,8 +444,8 @@ fontFamily:{"headline":["Noto Serif"],"body":["Manrope"],"label":["Manrope"]}}}}
         <button onclick="goToStep2()" class="flex-1 bg-surface-container-low text-on-surface-variant text-sm font-bold uppercase tracking-widest py-3.5 rounded-lg flex items-center justify-center gap-2">
           <span class="material-symbols-outlined text-base">edit</span> แก้ไข
         </button>
-        <button onclick="window.print()" class="flex-1 bg-surface-container-low text-on-surface-variant text-sm font-bold uppercase tracking-widest py-3.5 rounded-lg flex items-center justify-center gap-2">
-          <span class="material-symbols-outlined text-base">print</span> พิมพ์
+        <button onclick="exportPDF()" class="flex-1 bg-surface-container-low text-on-surface-variant text-sm font-bold uppercase tracking-widest py-3.5 rounded-lg flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-base">picture_as_pdf</span> Export PDF
         </button>
         <button onclick="resetAll()" class="flex-1 grad-btn text-white text-sm font-bold uppercase tracking-widest py-3.5 rounded-lg flex items-center justify-center gap-2">
           <span class="material-symbols-outlined text-base">add</span> ตรวจสาขาใหม่
@@ -378,7 +471,48 @@ fontFamily:{"headline":["Noto Serif"],"body":["Manrope"],"label":["Manrope"]}}}}
 
 <script>
 // ════ AUTH ════
-const USERS={'123456':'1234'};
+const USERS={
+  '490033':'1234','500759':'1234','510620':'1234','520532':'1234',
+  '570998':'1234','601338':'1234','582134':'1234','590022':'1234',
+  '602062':'1234','620520':'1234','560874':'1234','490057':'1234',
+  '651462':'1234','651221':'1234','123456':'1234'
+};
+const USERNAMES={
+  '490033':'นิรุต เจริญศิลป์','500759':'พัทธดนย์ วัฒนายุทธ',
+  '510620':'สีวิกา สังข์ด้วง','520532':'ศุกร์แสง วัฒนาฟุ้งเจริญ',
+  '570998':'นพชัย จันทร์รุ่ง','601338':'อนุรักษ์ สอนภักดี',
+  '582134':'ณธวรรท ศิริเมธานณ','590022':'คณัสวรรณ อิ่มสำราญ',
+  '602062':'ปราณี แซ่ลิ่ม','620520':'พลเดช มงคลแสน',
+  '560874':'จุรีพร ทองอาจ','490057':'พิมพ์พิชชา ชัชวาลย์',
+  '651462':'นุชจรินทร์ ใจยศ','651221':'ขวัญดาว บุญเรือง'
+};
+const BRANCH_BZM={
+  '5005':'นิรุต เจริญศิลป์','5010':'นิรุต เจริญศิลป์','5019':'นิรุต เจริญศิลป์',
+  '5038':'นิรุต เจริญศิลป์','5044':'นิรุต เจริญศิลป์','5046':'นิรุต เจริญศิลป์',
+  '5055':'นิรุต เจริญศิลป์','5065':'นิรุต เจริญศิลป์','5074':'นิรุต เจริญศิลป์',
+  '5080':'นิรุต เจริญศิลป์','5088':'นิรุต เจริญศิลป์',
+  '5001':'นพชัย จันทร์รุ่ง','5002':'นพชัย จันทร์รุ่ง','5016':'นพชัย จันทร์รุ่ง',
+  '5041':'นพชัย จันทร์รุ่ง','5045':'นพชัย จันทร์รุ่ง','5069':'นพชัย จันทร์รุ่ง',
+  '5072':'นพชัย จันทร์รุ่ง','5084':'นพชัย จันทร์รุ่ง','5085':'นพชัย จันทร์รุ่ง',
+  '5087':'นพชัย จันทร์รุ่ง','5091':'นพชัย จันทร์รุ่ง',
+  '5003':'พัทธดนย์ วัฒนายุทธ','5007':'พัทธดนย์ วัฒนายุทธ','5017':'พัทธดนย์ วัฒนายุทธ',
+  '5021':'พัทธดนย์ วัฒนายุทธ','5024':'พัทธดนย์ วัฒนายุทธ','5031':'พัทธดนย์ วัฒนายุทธ',
+  '5034':'พัทธดนย์ วัฒนายุทธ','5036':'พัทธดนย์ วัฒนายุทธ','5040':'พัทธดนย์ วัฒนายุทธ',
+  '5054':'พัทธดนย์ วัฒนายุทธ','5071':'พัทธดนย์ วัฒนายุทธ',
+  '5004':'สีวิกา สังข์ด้วง','5011':'สีวิกา สังข์ด้วง','5028':'สีวิกา สังข์ด้วง',
+  '5042':'สีวิกา สังข์ด้วง','5052':'สีวิกา สังข์ด้วง','5057':'สีวิกา สังข์ด้วง',
+  '5066':'สีวิกา สังข์ด้วง','5070':'สีวิกา สังข์ด้วง','5076':'สีวิกา สังข์ด้วง',
+  '5082':'สีวิกา สังข์ด้วง',
+  '5012':'อนุรักษ์ สอนภักดี','5018':'อนุรักษ์ สอนภักดี','5026':'อนุรักษ์ สอนภักดี',
+  '5027':'อนุรักษ์ สอนภักดี','5030':'อนุรักษ์ สอนภักดี','5033':'อนุรักษ์ สอนภักดี',
+  '5047':'อนุรักษ์ สอนภักดี','5050':'อนุรักษ์ สอนภักดี','5068':'อนุรักษ์ สอนภักดี',
+  '5073':'อนุรักษ์ สอนภักดี','5081':'อนุรักษ์ สอนภักดี','5089':'อนุรักษ์ สอนภักดี',
+  '5090':'อนุรักษ์ สอนภักดี',
+  '5013':'ศุกร์แสง วัฒนาฟุ้งเจริญ','5014':'ศุกร์แสง วัฒนาฟุ้งเจริญ','5015':'ศุกร์แสง วัฒนาฟุ้งเจริญ',
+  '5023':'ศุกร์แสง วัฒนาฟุ้งเจริญ','5035':'ศุกร์แสง วัฒนาฟุ้งเจริญ','5039':'ศุกร์แสง วัฒนาฟุ้งเจริญ',
+  '5049':'ศุกร์แสง วัฒนาฟุ้งเจริญ','5061':'ศุกร์แสง วัฒนาฟุ้งเจริญ','5062':'ศุกร์แสง วัฒนาฟุ้งเจริญ',
+  '5063':'ศุกร์แสง วัฒนาฟุ้งเจริญ','5064':'ศุกร์แสง วัฒนาฟุ้งเจริญ'
+};
 let currentUser=null;
 
 function doLogin(){
@@ -390,7 +524,9 @@ function doLogin(){
     document.getElementById('loginErr').classList.add('hidden');
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('mainApp').classList.remove('hidden');
-    document.getElementById('sidebarUser').textContent='EMP · '+u;
+    const uName=USERNAMES[u]||('EMP · '+u);
+    document.getElementById('sidebarUser').textContent=uName;
+    if(USERNAMES[u])document.getElementById('inspector').value=USERNAMES[u];
     document.getElementById('auditDate').value=new Date().toISOString().split('T')[0];
     initSectionsOverview();
     setStep(1);
@@ -416,6 +552,26 @@ function togglePass(){
   const e=document.getElementById('passEye');
   i.type=i.type==='password'?'text':'password';
   e.textContent=i.type==='password'?'visibility':'visibility_off';
+}
+
+// ════ BRANCH CHANGE ════
+function onBranchChange(){
+  const v=document.getElementById('branchCode').value;
+  const bzm=BRANCH_BZM[v]||'';
+  document.getElementById('bzmManager').value=bzm;
+}
+
+// ════ PDF EXPORT ════
+function exportPDF(){
+  // Make sure dashboard is visible before printing
+  const s3=document.getElementById('step3');
+  const wasHidden=s3.classList.contains('hidden');
+  if(wasHidden)s3.classList.remove('hidden');
+  document.title='LT QA Audit — '+
+    (document.getElementById('branchCode').options[document.getElementById('branchCode').selectedIndex]?.text||'Report')+
+    ' — '+(document.getElementById('auditDate').value||'');
+  window.print();
+  if(wasHidden)s3.classList.add('hidden');
 }
 
 // ════ DRAWER ════
@@ -842,6 +998,7 @@ function buildDashboard(){
   const date=document.getElementById('auditDate').value;
   const insp=document.getElementById('inspector').value;
   const mgr=document.getElementById('manager').value;
+  const bzm=document.getElementById('bzmManager').value;
   const fails=ITEMS.filter(i=>answers[i.no]==='fail').length;
   const totalPh=Object.values(photos).reduce((a,b)=>a+b.length,0);
 
@@ -853,13 +1010,13 @@ function buildDashboard(){
     <div class="flex-1 min-w-0">
       <p class="text-[10px] uppercase tracking-widest font-bold mb-1 truncate" style="color:#FF6B00">${bName}</p>
       <h1 class="text-xl lg:text-2xl font-black text-white font-['Noto_Serif'] mb-2">Audit Result</h1>
-      <p class="text-white/50 text-xs leading-relaxed hidden sm:block">📅 ${date} · 👤 ${insp} · 🏪 ${mgr||'—'}</p>
-      <p class="text-white/50 text-xs sm:hidden">📅 ${date}</p>
+      <p class="text-white/50 text-xs leading-relaxed hidden sm:block">📅 ${date} · 👤 ${insp}${bzm?' · 🗂 BZM: '+bzm:''} · 🏪 ${mgr||'—'}</p>
+      <p class="text-white/50 text-xs sm:hidden">📅 ${date} · ${insp}</p>
       <span class="inline-block mt-2 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-lg ${grade.cls}">${grade.label}</span>
     </div>`;
 
   document.getElementById('kpiGrid').innerHTML=[
-    {val:167,lbl:'Total',icon:'assignment',c:'border-orange-400'},
+    {val:ITEMS.length,lbl:'Total',icon:'assignment',c:'border-orange-400'},
     {val:ITEMS.length-fails,lbl:'Passed',icon:'check_circle',c:'border-green-500'},
     {val:fails,lbl:'Failed',icon:'cancel',c:'border-red-500'},
     {val:totalPh,lbl:'Photos',icon:'photo_library',c:'border-blue-500'},
@@ -912,7 +1069,7 @@ function buildDashboard(){
 function resetAll(){
   answers={};remarks={};photos={};currentSec='A';
   if(chartInstance){chartInstance.destroy();chartInstance=null;}
-  ['branchCode','inspector','manager','serviceStaff','kitchenStaff'].forEach(id=>document.getElementById(id).value='');
+  ['branchCode','bzmManager','inspector','manager','serviceStaff','kitchenStaff'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('auditDate').value=new Date().toISOString().split('T')[0];
   setStep(1);
 }
